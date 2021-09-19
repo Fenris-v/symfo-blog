@@ -14,3 +14,4 @@
 ###< symfony/phpunit-bridge ###
 
 .idea
+/templates/symfony-diploma-layout/
