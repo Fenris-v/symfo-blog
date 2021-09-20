@@ -5,7 +5,15 @@
 ```shell
 composer install
 ```
-3. Создать БД  
+3. Установить зависимости `npm`  
+```shell
+npm install
+```
+4. Выполнить компиляцию стилей
+```shell
+npm run build
+```
+5. Создать БД  
 ```shell
 php bin/console doctrine:database:create
 ```
@@ -17,9 +25,9 @@ php bin/console doctrine:database:create
 [comment]: <> (php bin/console doctrine:fixtures:load)
 
 [comment]: <> (```)
-4. Выполнить запуск проекта на локальном сервере командой
+6. Выполнить запуск проекта на локальном сервере командой
 ```shell
 symfony server:start -d
 ```
 ---
-Сервис будет доступен по адресу `https://127.0.0.1:8000/`
+Сервис будет доступен по адресу [https://127.0.0.1:8000/](https://127.0.0.1:8000/)
