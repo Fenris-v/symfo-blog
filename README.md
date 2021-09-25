@@ -17,15 +17,15 @@ npm run build
 ```shell
 php bin/console doctrine:database:create
 ```
-
-[comment]: <> (4. Выполнить миграции)
-
-[comment]: <> (```shell)
-
-[comment]: <> (php bin/console doctrine:fixtures:load)
-
-[comment]: <> (```)
-6. Выполнить запуск проекта на локальном сервере командой
+6. Выполнить миграции  
+```shell
+php bin/console doctrine:migrations:migrate
+```
+7. Выполнить фикстуры  
+```shell
+php bin/console doctrine:fixtures:load
+```
+8. Выполнить запуск проекта на локальном сервере командой
 ```shell
 symfony server:start -d
 ```

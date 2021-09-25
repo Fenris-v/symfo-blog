@@ -1,0 +1,15 @@
+{% extends 'email/base.html.twig' %}
+
+{% block content %}
+    <div class="content">
+        <table>
+            <tr>
+                <td>
+                    <h1>Добро пожаловать, <b>{{ email.toName }}</b>!</h1>
+                    <p class="lead">Чтобы подтвердить свой email нажмите на кнопку.</p>
+                    <a class="btn" href="{{ url('app_confirm', {'code': user.confirmationCode}) }}">Подтвердить email</a>
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}
