@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Events\UserPasswordResetEvent;
+use App\Events\UserReactivateEvent;
 use App\Events\UserRegisteredEvent;
+use App\Form\UserPasswordResetFormType;
 use App\Form\UserRegistrationFormType;
 use App\Repository\UserRepository;
 use App\Security\LoginFormAuthenticator;
@@ -17,6 +20,9 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
+use Symfony\Component\Validator\Constraints\Email;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SecurityController extends AbstractController
 {
@@ -120,5 +126,159 @@ class SecurityController extends AbstractController
             $loginFormAuthenticator,
             $request
         );
+    }
+
+    /**
+     * Повторная активация
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param ValidatorInterface $validator
+     * @param EventDispatcherInterface $eventDispatcher
+     * @return Response
+     */
+    #[Route('/reactivate', name: 'app_reactivate')]
+    public function reactivate(
+        Request $request,
+        UserRepository $userRepository,
+        ValidatorInterface $validator,
+        EventDispatcherInterface $eventDispatcher
+    ): Response {
+        if ($request->request->get('email')) {
+            $email = $request->request->get('email');
+
+            $validate = $this->emailValidation('security/reactivate.html.twig', $validator, $email);
+            if ($validate) {
+                return $validate;
+            }
+
+            $user = $userRepository->findOneBy(['email' => $email]);
+
+            if (!$user) {
+                $error = "Пользователь $email не найден";
+            } elseif ($user->getIsActive()) {
+                $error = "Пользователь $email уже активирован";
+            } else {
+                $eventDispatcher->dispatch(new UserReactivateEvent($user));
+
+                $this->addFlash(
+                    'flash_reactivate',
+                    'На почту было отправлено письмо'
+                );
+            }
+        }
+
+        return $this->render(
+            'security/reactivate.html.twig',
+            ['errors' => $error ?? null]
+        );
+    }
+
+    /**
+     * Страница запроса сброса пароля
+     * @param Request $request
+     * @param UserRepository $userRepository
+     * @param ValidatorInterface $validator
+     * @param EventDispatcherInterface $eventDispatcher
+     * @return Response
+     */
+    #[Route('/reset', name: 'app_reset_password')]
+    public function resetPassword(
+        Request $request,
+        UserRepository $userRepository,
+        ValidatorInterface $validator,
+        EventDispatcherInterface $eventDispatcher
+    ): Response {
+        if ($request->request->get('email')) {
+            $email = $request->request->get('email');
+
+            $validate = $this->emailValidation('security/reset_password.html.twig', $validator, $email);
+            if ($validate) {
+                return $validate;
+            }
+
+            $user = $userRepository->findOneBy(['email' => $email]);
+
+            if (!$user) {
+                $error = "Пользователь $email не найден";
+            } else {
+                $eventDispatcher->dispatch(new UserPasswordResetEvent($user));
+
+                $this->addFlash(
+                    'flash_password_reset',
+                    'На почту было отправлено письмо'
+                );
+            }
+        }
+
+        return $this->render(
+            'security/reset_password.html.twig',
+            ['errors' => $error ?? null]
+        );
+    }
+
+    /**
+     * Страница сброса пароля
+     */
+    #[Route('/reset/{code}', name: 'app_change_password')]
+    public function changePassword(
+        string $code,
+        UserRepository $userRepository,
+        UserPasswordHasherInterface $passwordHasher,
+        Request $request
+    ): Response {
+        $user = $userRepository->findOneBy(['confirmationCode' => $code]);
+
+        if ($user === null) {
+            return new Response('404');
+        }
+
+        $form = $this->createForm(UserPasswordResetFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $userRepository->updatePassword($user, $form->getData(), $passwordHasher);
+
+            $this->addFlash(
+                'flash_password_reset',
+                'Пароль изменён'
+            );
+        }
+
+        return $this->render(
+            'security/new_password.html.twig',
+            [
+                'errors' => $error ?? null,
+                'passwordResetForm' => $form->createView()
+            ]
+        );
+    }
+
+    /**
+     * Валидация поля ввода email
+     * @param string $template
+     * @param ValidatorInterface $validator
+     * @param string $email
+     * @return Response|null
+     */
+    private function emailValidation(
+        string $template,
+        ValidatorInterface $validator,
+        string $email
+    ) {
+        $violations = $validator->validate($email, [
+            new NotBlank(['message' => 'Поле Email не может быть пустым']),
+            new Email(['message' => 'Поле Email должно быть действительным email адресом'])
+        ]);
+
+        if ($violations->count() > 0) {
+            return $this->render(
+                $template,
+                [
+                    'errors' => $violations->get(0)->getMessage()
+                ]
+            );
+        }
+
+        return null;
     }
 }

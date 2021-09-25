@@ -5,7 +5,7 @@
         <table>
             <tr>
                 <td>
-                    <h1>Добро пожаловать, <b>{{ email.toName }}</b>!</h1>
+                    <h1>Повторная активация</h1>
                     <p class="lead">Чтобы подтвердить свой email нажмите на кнопку.</p>
                     <a class="btn"
                        href="{{ url('app_confirm', {'code': user.confirmationCode}) }}">

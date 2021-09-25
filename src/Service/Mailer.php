@@ -19,6 +19,7 @@ class Mailer
     }
 
     /**
+     * Отправка письма для подтверждения регистрации
      * @param User $user
      * @throws TransportExceptionInterface
      */
@@ -28,6 +29,40 @@ class Mailer
             'email/confirmation.html.twig',
             $user,
             'Подтверждение регистрации',
+            function (TemplatedEmail $email) use ($user) {
+                $email->context(['user' => $user]);
+            }
+        );
+    }
+
+    /**
+     * Отправка письма для повторной активации
+     * @param User $user
+     * @throws TransportExceptionInterface
+     */
+    public function sendReactivateMessage(User $user)
+    {
+        $this->send(
+            'email/reactivate.html.twig',
+            $user,
+            'Повторная активация',
+            function (TemplatedEmail $email) use ($user) {
+                $email->context(['user' => $user]);
+            }
+        );
+    }
+
+    /**
+     * Отправка письма для сброса пароля
+     * @param User $user
+     * @throws TransportExceptionInterface
+     */
+    public function sendPasswordResetMessage(User $user)
+    {
+        $this->send(
+            'email/reset_password.html.twig',
+            $user,
+            'Сброс пароля',
             function (TemplatedEmail $email) use ($user) {
                 $email->context(['user' => $user]);
             }

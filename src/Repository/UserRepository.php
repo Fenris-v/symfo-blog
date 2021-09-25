@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Form\Model\PasswordFormModel;
 use App\Form\Model\UserRegistrationFormModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
@@ -63,7 +64,9 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                     $user,
                     $formModel->plainPassword
                 )
-            )->setConfirmationCode(md5(uniqid(rand(), true)));
+            );
+
+        $this->updateConfirmationCode($user);
 
         $this->_em->persist($user);
         $this->_em->flush();
@@ -89,6 +92,50 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $user->setIsActive(true);
         $user->setConfirmationCode(null);
 
+        $this->_em->flush();
+
+        return $user;
+    }
+
+    /**
+     * Обновляет код подтверждения
+     * @param User $user
+     * @param bool $save
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function updateConfirmationCode(User $user, bool $save = false)
+    {
+        $user->setConfirmationCode(md5(uniqid(rand(), true)));
+
+        if ($save) {
+            $this->_em->persist($user);
+            $this->_em->flush();
+        }
+    }
+
+    /**
+     * Обновляет пароль
+     * @param User $user
+     * @param PasswordFormModel $formModel
+     * @param UserPasswordHasherInterface $passwordHasher
+     * @return User
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function updatePassword(
+        User $user,
+        PasswordFormModel $formModel,
+        UserPasswordHasherInterface $passwordHasher
+    ) {
+        $user->setPassword(
+            $passwordHasher->hashPassword(
+                $user,
+                $formModel->plainPassword
+            )
+        )->setConfirmationCode(null);
+
+        $this->_em->persist($user);
         $this->_em->flush();
 
         return $user;

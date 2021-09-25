@@ -5,7 +5,7 @@ namespace App\Form\Model;
 use App\Validator\UniqueUser;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class UserRegistrationFormModel
+class UserRegistrationFormModel extends PasswordFormModel
 {
     /**
      * @Assert\NotBlank(message="Поле не может быть пустым")
@@ -18,10 +18,4 @@ class UserRegistrationFormModel
      * @Assert\NotBlank(message="Поле не может быть пустым")
      */
     public string $firstName;
-
-    /**
-     * @Assert\NotBlank(message="Пароль не указан")
-     * @Assert\Length(min="6", minMessage="Пароль должен быть длиной не меньше 6 символов")
-     */
-    public string $plainPassword;
 }
