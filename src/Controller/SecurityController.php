@@ -11,6 +11,7 @@ use App\Repository\UserRepository;
 use App\Security\LoginFormAuthenticator;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Exception;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -143,34 +144,32 @@ class SecurityController extends AbstractController
         ValidatorInterface $validator,
         EventDispatcherInterface $eventDispatcher
     ): Response {
-        if ($request->request->get('email')) {
+        try {
             $email = $request->request->get('email');
-
-            $validate = $this->emailValidation('security/reactivate.html.twig', $validator, $email);
-            if ($validate) {
-                return $validate;
-            }
-
+            $this->emailValidation($validator, $email);
             $user = $userRepository->findOneBy(['email' => $email]);
 
             if (!$user) {
-                $error = "Пользователь $email не найден";
-            } elseif ($user->getIsActive()) {
-                $error = "Пользователь $email уже активирован";
-            } else {
-                $eventDispatcher->dispatch(new UserReactivateEvent($user));
-
-                $this->addFlash(
-                    'flash_reactivate',
-                    'На почту было отправлено письмо'
-                );
+                throw new Exception("Пользователь $email не найден");
             }
-        }
 
-        return $this->render(
-            'security/reactivate.html.twig',
-            ['errors' => $error ?? null]
-        );
+            if ($user->getIsActive()) {
+                throw new Exception("Пользователь $email уже активирован");
+            }
+
+            $eventDispatcher->dispatch(new UserReactivateEvent($user));
+
+            $this->addFlash(
+                'flash_reactivate',
+                'На почту было отправлено письмо'
+            );
+        } catch (Exception $exception) {
+        } finally {
+            return $this->render(
+                'security/reactivate.html.twig',
+                ['errors' => isset($exception) ? $exception->getMessage() : null]
+            );
+        }
     }
 
     /**
@@ -188,32 +187,28 @@ class SecurityController extends AbstractController
         ValidatorInterface $validator,
         EventDispatcherInterface $eventDispatcher
     ): Response {
-        if ($request->request->get('email')) {
+        try {
             $email = $request->request->get('email');
-
-            $validate = $this->emailValidation('security/reset_password.html.twig', $validator, $email);
-            if ($validate) {
-                return $validate;
-            }
-
+            $this->emailValidation($validator, $email);
             $user = $userRepository->findOneBy(['email' => $email]);
 
             if (!$user) {
-                $error = "Пользователь $email не найден";
-            } else {
-                $eventDispatcher->dispatch(new UserPasswordResetEvent($user));
-
-                $this->addFlash(
-                    'flash_password_reset',
-                    'На почту было отправлено письмо'
-                );
+                throw new Exception("Пользователь $email не найден");
             }
-        }
 
-        return $this->render(
-            'security/reset_password.html.twig',
-            ['errors' => $error ?? null]
-        );
+            $eventDispatcher->dispatch(new UserPasswordResetEvent($user));
+
+            $this->addFlash(
+                'flash_password_reset',
+                'На почту было отправлено письмо'
+            );
+        } catch (Exception $exception) {
+        } finally {
+            return $this->render(
+                'security/reactivate.html.twig',
+                ['errors' => isset($exception) ? $exception->getMessage() : null]
+            );
+        }
     }
 
     /**
@@ -255,30 +250,20 @@ class SecurityController extends AbstractController
 
     /**
      * Валидация поля ввода email
-     * @param string $template
      * @param ValidatorInterface $validator
      * @param string $email
-     * @return Response|null
+     * @return void
+     * @throws Exception
      */
-    private function emailValidation(
-        string $template,
-        ValidatorInterface $validator,
-        string $email
-    ) {
+    private function emailValidation(ValidatorInterface $validator, string $email)
+    {
         $violations = $validator->validate($email, [
             new NotBlank(['message' => 'Поле Email не может быть пустым']),
             new Email(['message' => 'Поле Email должно быть действительным email адресом'])
         ]);
 
         if ($violations->count() > 0) {
-            return $this->render(
-                $template,
-                [
-                    'errors' => $violations->get(0)->getMessage()
-                ]
-            );
+            throw new Exception($violations->get(0)->getMessage());
         }
-
-        return null;
     }
 }

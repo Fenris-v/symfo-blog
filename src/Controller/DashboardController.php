@@ -6,13 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-class TempController extends AbstractController
+class DashboardController extends AbstractController
 {
-    #[Route('/temp', name: 'app_temp')]
+    #[Route('/dashboard', name: 'app_dashboard')]
     public function index(): Response
     {
-        dump('You was authorized');
-
         return $this->render('base.html.twig');
     }
 }

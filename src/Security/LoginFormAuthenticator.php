@@ -96,8 +96,7 @@ class LoginFormAuthenticator extends AbstractAuthenticator
         $path = $this->getTargetPath($request->getSession(), $firewallName);
 
         return new RedirectResponse(
-        // TODO: заменить маршрут
-            $path ?: $this->urlGenerator->generate('app_temp')
+            $path ?: $this->urlGenerator->generate('app_dashboard')
         );
     }
 
