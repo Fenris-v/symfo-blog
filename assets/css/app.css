@@ -298,6 +298,14 @@ body.signin-body {
   color: #777;
 }
 
+.form-label-group label .invalid-feedback {
+  display: none !important;
+}
+
+.invalid-feedback {
+  margin-bottom: 0.25rem;
+}
+
 /* Fallback for Edge
 -------------------------------------------------- */
 @supports (-ms-ime-align: auto) {
