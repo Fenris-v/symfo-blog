@@ -1,0 +1,31 @@
+{% for subscription in subscriptions %}
+    <div class="col-lg-4">
+        <div class="card mb-5 mb-lg-0">
+            <div class="card-body">
+                {% if subscription.id == user.subscription.id %}
+                    <h5 class="card-title text-uppercase text-center current text-warning">
+                        <i class="fas fa-check"></i> Plus
+                    </h5>
+                {% else %}
+                    <h5 class="card-title text-muted text-uppercase text-center">
+                        {{ subscription.name }}
+                    </h5>
+                {% endif %}
+                <h6 class="card-price text-center">${{ subscription.price }}<span
+                            class="period">/неделя</span>
+                </h6>
+                <hr>
+                {{ subscription.description | raw }}
+
+                {% if subscription.id == user.subscription.id %}
+                    <a class="btn btn-block btn-secondary text-uppercase" disabled>
+                        Текущий уровень
+                    </a>
+                {% elseif subscription.price > user.subscription.price %}
+                    <a href="{{ path('app_subscription_update', {'subscription': subscription.id}) }}"
+                       class="btn btn-block btn-primary text-uppercase">Оформить</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endfor %}

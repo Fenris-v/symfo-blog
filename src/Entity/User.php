@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -49,6 +51,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @ORM\Column(type="string", length=255, nullable=true)
      */
     private $confirmationCode;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=Subscription::class, inversedBy="users")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $subscription;
+
+    /**
+     * @ORM\Column(type="datetime", nullable=true)
+     */
+    private $subscription_left;
 
     public function getId(): ?int
     {
@@ -146,5 +159,29 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __call(string $name, array $arguments)
     {
+    }
+
+    public function getSubscription(): ?Subscription
+    {
+        return $this->subscription;
+    }
+
+    public function setSubscription(?Subscription $subscription): self
+    {
+        $this->subscription = $subscription;
+
+        return $this;
+    }
+
+    public function getSubscriptionLeft(): ?\DateTimeInterface
+    {
+        return $this->subscription_left;
+    }
+
+    public function setSubscriptionLeft(?\DateTimeInterface $subscription_left): self
+    {
+        $this->subscription_left = $subscription_left;
+
+        return $this;
     }
 }

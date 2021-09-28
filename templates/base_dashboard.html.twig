@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="d-flex" id="wrapper">
+        <div class="bg-light border-right" id="sidebar-wrapper">
+            <div class="sidebar-heading">BlaBlaArticle</div>
+            <div class="list-group list-group-flush">
+                <a href="{{ path('app_dashboard') }}"
+                   class="list-group-item list-group-item-action {{ app.request.requestUri == path('app_dashboard') ? 'active' : 'bg-light' }}">
+                    Рабочий стол
+                </a>
+                <a href="{{ path('app_article_create') }}"
+                   class="list-group-item list-group-item-action {{ app.request.requestUri == path('app_article_create') ? 'active' : 'bg-light' }}">
+                    Создать статью
+                </a>
+                <a href="{{ path('app_article_history') }}"
+                   class="list-group-item list-group-item-action {{ app.request.requestUri == path('app_article_history') ? 'active' : 'bg-light' }}">
+                    История статей
+                </a>
+                <a href="{{ path('app_subscription') }}"
+                   class="list-group-item list-group-item-action {{ app.request.requestUri == path('app_subscription') ? 'active' : 'bg-light' }}">
+                    Подписка
+                </a>
+                <a href="{{ path('app_profile') }}"
+                   class="list-group-item list-group-item-action {{ app.request.requestUri == path('app_profile') ? 'active' : 'bg-light' }}">
+                    Профиль
+                </a>
+                <a href="{{ path('app_modules') }}"
+                   class="list-group-item list-group-item-action {{ app.request.requestUri == path('app_modules') ? 'active' : 'bg-light' }}">
+                    Модули генератора
+                </a>
+            </div>
+        </div>
+
+        <div id="page-content-wrapper">
+            <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+                <button class="btn btn-primary" id="menu-toggle">Скрыть меню</button>
+
+                <button class="navbar-toggler" type="button" data-toggle="collapse"
+                        data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Показать/Скрыть навигацию">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+                        <li class="nav-item active">
+                            <a class="nav-link" href="{{ path('app_logout') }}">Выйти</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <div class="container-fluid">
+                <h1 class="mt-4">{% block h1 %}{% endblock %}</h1>
+                <div class="row">
+                    {% block content %}{% endblock %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
