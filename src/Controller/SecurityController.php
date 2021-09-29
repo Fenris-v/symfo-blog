@@ -205,7 +205,7 @@ class SecurityController extends AbstractController
         } catch (Exception $exception) {
         } finally {
             return $this->render(
-                'security/reactivate.html.twig',
+                'security/reset_password.html.twig',
                 ['errors' => isset($exception) ? $exception->getMessage() : null]
             );
         }

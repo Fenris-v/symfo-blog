@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\User;
+use App\Entity\Subscription as Subscription;
 use Closure;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
@@ -16,6 +17,24 @@ class Mailer
         private string $siteName,
         private string $emailForSend
     ) {
+    }
+
+    /**
+     * Отправка уведомления об обновлении подписки
+     * @param User $user
+     * @param Subscription $subscription
+     * @throws TransportExceptionInterface
+     */
+    public function sendUpdateSubscriptionNotify(User $user, Subscription $subscription)
+    {
+        $this->send(
+            'email/update_subscription.html.twig',
+            $user,
+            'Обновление подписки',
+            function (TemplatedEmail $email) use ($user, $subscription) {
+                $email->context(['user' => $user, 'subscription' => $subscription]);
+            }
+        );
     }
 
     /**

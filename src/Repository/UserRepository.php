@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\User;
 use App\Form\Model\PasswordFormModel;
 use App\Form\Model\UserRegistrationFormModel;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
@@ -134,6 +135,27 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
                 $formModel->plainPassword
             )
         )->setConfirmationCode(null);
+
+        $this->_em->persist($user);
+        $this->_em->flush();
+
+        return $user;
+    }
+
+    /**
+     * @param User $user
+     * @param string $subscriptionSlug
+     * @param DateTime $dateOfEnd
+     * @return User
+     * @throws ORMException
+     * @throws OptimisticLockException
+     */
+    public function updateSubscriptionLevel(
+        User $user,
+        string $subscriptionSlug,
+        DateTime $dateOfEnd
+    ): User {
+        $user->setSubscription($subscriptionSlug)->setSubscriptionLeft($dateOfEnd);
 
         $this->_em->persist($user);
         $this->_em->flush();

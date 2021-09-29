@@ -2,6 +2,8 @@
 
 {% block body_class %}signin-body{% endblock %}
 
+{% block title %}BlaBlaArticle - Регистрация{% endblock %}
+
 {% block body %}
     <div class="container">
         <div class="row">
@@ -10,11 +12,11 @@
                     <div class="card-body">
                         <h5 class="card-title text-center">Регистрация</h5>
                         {% if app.session.flashBag.peek('flash_register') | length > 0 %}
-                        <div class="alert alert-success" role="alert">
-                            {% for message in app.flashes('flash_register') %}
-                                <p class="mb-0">{{ message }}</p>
-                            {% endfor %}
-                        </div>
+                            <div class="alert alert-success" role="alert">
+                                {% for message in app.flashes('flash_register') %}
+                                    <p class="mb-0">{{ message }}</p>
+                                {% endfor %}
+                            </div>
                         {% endif %}
 
                         {{ form_start(registerForm) }}

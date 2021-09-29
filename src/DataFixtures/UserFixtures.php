@@ -2,6 +2,7 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Subscription;
 use App\Entity\User;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -20,7 +21,9 @@ class UserFixtures extends BaseFixtures
                 ->setPassword(
                     $this->passwordHasher
                         ->hashPassword($user, '123456')
-                )->setIsActive(true);
+                )->setIsActive(true)
+                ->setSubscription($this->faker->randomElement(Subscription::LEVELS))
+                ->setSubscriptionLeft($this->faker->dateTimeBetween('+1days', '+3days'));
         });
 
         $this->createMany(User::class, 10, function (User $user) {
@@ -29,9 +32,21 @@ class UserFixtures extends BaseFixtures
                 ->setPassword(
                     $this->passwordHasher
                         ->hashPassword($user, '123456')
-                )->setIsActive(true);
+                )->setIsActive(true)
+                ->setSubscription($this->faker->randomElement(Subscription::LEVELS))
+                ->setSubscriptionLeft($this->faker->dateTimeBetween('-2days', '+7days'));
         });
 
         $manager->flush();
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getDependencies(): array
+    {
+        return [
+            Subscription::class
+        ];
     }
 }

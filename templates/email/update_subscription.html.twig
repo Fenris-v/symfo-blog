@@ -1,0 +1,17 @@
+{% extends 'email/base.html.twig' %}
+
+{% block content %}
+    <div class="content">
+        <table>
+            <tr>
+                <td>
+                    <h1>Здравствуйте, <b>{{ email.toName }}</b>!</h1>
+                    <p class="lead">
+                        Ваша подписка была обновлена до уровня {{ subscription.name }}.
+                        Подписка действует до {{ user.subscriptionLeft | date('d.m.Y') }}.
+                    </p>
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endblock %}
