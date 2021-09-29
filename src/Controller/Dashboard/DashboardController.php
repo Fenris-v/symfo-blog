@@ -2,10 +2,7 @@
 
 namespace App\Controller\Dashboard;
 
-use App\Entity\Subscription;
 use App\Entity\User;
-use App\Repository\SubscriptionRepository;
-use App\Repository\UserRepository;
 use App\Service\Subscription as SubscriptionService;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,27 +15,23 @@ use Symfony\Component\Security\Core\Security;
  */
 class DashboardController extends AbstractController
 {
+    /**
+     * @param SubscriptionService $subscriptionService
+     * @param Security $security
+     * @return Response
+     */
     #[Route('/dashboard', name: 'app_dashboard')]
-    public function index(
-        SubscriptionService $subscriptionService,
-        Security $security,
-        UserRepository $userRepository,
-        SubscriptionRepository $subscriptionRepository
-    ): Response {
+    public function index(SubscriptionService $subscriptionService, Security $security): Response
+    {
         /** @var User $user */
         $user = $security->getUser();
-
-        if (!$subscriptionService->isActive($user)) {
-            $userRepository->updateSubscription(
-                $user,
-                $subscriptionRepository->findOneBy(['slug' => Subscription::FREE])
-            );
-        }
+        $subscription = $subscriptionService->getSubscription($user);
 
         return $this->render('dashboard/index.html.twig', [
             'daysForEnd' => $subscriptionService->getDaysForEndSubscription($user),
             'user' => $user,
-            'canUpdate' => $user->getSubscription()->getSlug() !== Subscription::MAX_SUBSCRIPTION_LEVEL
+            'canUpdate' => $subscriptionService->canUpdate($subscription),
+            'subscription' => $subscription
         ]);
     }
 }

@@ -4,7 +4,6 @@ namespace App\Entity;
 
 use App\Repository\SubscriptionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Mapping\Annotation as Gedmo;
 
@@ -13,8 +12,11 @@ use Gedmo\Mapping\Annotation as Gedmo;
  */
 class Subscription
 {
-    const FREE = 'free';
-    const MAX_SUBSCRIPTION_LEVEL = 'pro';
+    const LEVELS = [
+        'min' => 'free',
+        'middle' => 'plus',
+        'max' => 'pro'
+    ];
 
     /**
      * @ORM\Id
@@ -43,11 +45,6 @@ class Subscription
      * @ORM\Column(type="text", nullable=true)
      */
     private $description;
-
-    /**
-     * @ORM\OneToMany(targetEntity=User::class, mappedBy="subscription")
-     */
-    private $users;
 
     public function __construct()
     {
@@ -103,36 +100,6 @@ class Subscription
     public function setDescription(?string $description): self
     {
         $this->description = $description;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection
-     */
-    public function getUsers(): Collection
-    {
-        return $this->users;
-    }
-
-    public function addUser(User $user): self
-    {
-        if (!$this->users->contains($user)) {
-            $this->users[] = $user;
-            $user->setSubscription($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUser(User $user): self
-    {
-        if ($this->users->removeElement($user)) {
-            // set the owning side to null (unless already changed)
-            if ($user->getSubscription() === $this) {
-                $user->setSubscription(null);
-            }
-        }
 
         return $this;
     }

@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Entity\Subscription as SubscriptionModel;
 use App\Entity\User;
+use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
 use DateTime;
 use Doctrine\ORM\OptimisticLockException;
@@ -11,6 +12,12 @@ use Doctrine\ORM\ORMException;
 
 class Subscription
 {
+    public function __construct(
+        private UserRepository $userRepository,
+        private SubscriptionRepository $subscriptionRepository
+    ) {
+    }
+
     /**
      * Возвращает количество дней до конца подписки
      * @param User $user
@@ -28,25 +35,52 @@ class Subscription
     }
 
     /**
+     * Возвращает подписку
+     * @param User $user
+     * @return SubscriptionModel
+     */
+    public function getSubscription(User $user): SubscriptionModel
+    {
+        if ($user->getSubscription() && $this->isActive($user)) {
+            return $this->subscriptionRepository
+                ->findOneBy(['slug' => $user->getSubscription()]);
+        }
+
+        return $this->subscriptionRepository
+            ->findOneBy(['slug' => SubscriptionModel::LEVELS['min']]);
+    }
+
+    /**
+     * Можно ли обновить подписку
+     * @param SubscriptionModel $subscription
+     * @return bool
+     */
+    public function canUpdate(SubscriptionModel $subscription)
+    {
+        return $subscription->getSlug() !== SubscriptionModel::LEVELS['max'];
+    }
+
+    /**
      * Можно ли обновить подписку
      * @param User $user
-     * @param UserRepository $userRepository
      * @param SubscriptionModel $subscription
      * @return bool
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function updateSubscription(
-        User $user,
-        UserRepository $userRepository,
-        SubscriptionModel $subscription
-    ): bool {
-        if ($subscription->getPrice() > $user->getSubscription()->getPrice()) {
-            $userRepository->updateSubscription($user, $subscription);
-            return true;
+    public function updateSubscription(User $user, SubscriptionModel $subscription): bool
+    {
+        if ($subscription->getPrice() <= $this->getSubscription($user)->getPrice()) {
+            return false;
         }
 
-        return false;
+        $this->userRepository->updateSubscriptionLevel(
+            $user,
+            $subscription->getSlug(),
+            (new DateTime())->modify('+1 week')
+        );
+
+        return true;
     }
 
     /**

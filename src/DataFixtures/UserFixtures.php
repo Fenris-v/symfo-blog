@@ -22,8 +22,8 @@ class UserFixtures extends BaseFixtures
                     $this->passwordHasher
                         ->hashPassword($user, '123456')
                 )->setIsActive(true)
-                ->setSubscription($this->getRandomReference(Subscription::class))
-            ->setSubscriptionLeft($this->faker->dateTimeBetween('+1days', '+3days'));
+                ->setSubscription($this->faker->randomElement(Subscription::LEVELS))
+                ->setSubscriptionLeft($this->faker->dateTimeBetween('+1days', '+3days'));
         });
 
         $this->createMany(User::class, 10, function (User $user) {
@@ -33,8 +33,8 @@ class UserFixtures extends BaseFixtures
                     $this->passwordHasher
                         ->hashPassword($user, '123456')
                 )->setIsActive(true)
-                ->setSubscription($this->getRandomReference(Subscription::class))
-                ->setSubscriptionLeft($this->faker->dateTimeBetween('-2days','+7days'));
+                ->setSubscription($this->faker->randomElement(Subscription::LEVELS))
+                ->setSubscriptionLeft($this->faker->dateTimeBetween('-2days', '+7days'));
         });
 
         $manager->flush();

@@ -53,15 +53,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $confirmationCode;
 
     /**
-     * @ORM\ManyToOne(targetEntity=Subscription::class, inversedBy="users")
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\Column(type="string", length=50, nullable=true)
      */
     private $subscription;
 
     /**
      * @ORM\Column(type="datetime", nullable=true)
      */
-    private $subscription_left;
+    private $subscriptionLeft;
 
     public function getId(): ?int
     {
@@ -161,12 +160,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
     }
 
-    public function getSubscription(): ?Subscription
+    public function getSubscription(): ?string
     {
         return $this->subscription;
     }
 
-    public function setSubscription(?Subscription $subscription): self
+    public function setSubscription(?string $subscription): self
     {
         $this->subscription = $subscription;
 
@@ -175,12 +174,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function getSubscriptionLeft(): ?\DateTimeInterface
     {
-        return $this->subscription_left;
+        return $this->subscriptionLeft;
     }
 
-    public function setSubscriptionLeft(?\DateTimeInterface $subscription_left): self
+    public function setSubscriptionLeft(?\DateTimeInterface $subscriptionLeft): self
     {
-        $this->subscription_left = $subscription_left;
+        $this->subscriptionLeft = $subscriptionLeft;
 
         return $this;
     }

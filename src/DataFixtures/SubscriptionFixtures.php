@@ -15,8 +15,6 @@ class SubscriptionFixtures extends BaseFixtures
                 ->setDescription(
                     '<ul class="fa-ul"><li><span class="fa-li"><i class="fas fa-check"></i></span>Возможность создать более 1 статьи</li><li><span class="fa-li"><i class="fas fa-check"></i></span>Базовые возможности генератора</li><li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Продвинутые возможности генератора</li><li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Свои модули</li></ul>'
                 );
-
-            $this->addReference(Subscription::class . '|0', $subscription);
         });
 
         $this->create(Subscription::class, function (Subscription $subscription) use ($manager) {
@@ -25,8 +23,6 @@ class SubscriptionFixtures extends BaseFixtures
                 ->setDescription(
                     '<ul class="fa-ul"><li><span class="fa-li"><i class="fas fa-check"></i></span>Возможность создать более 1 статьи</li><li><span class="fa-li"><i class="fas fa-check"></i></span>Базовые возможности генератора</li><li><span class="fa-li"><i class="fas fa-check"></i></span>Продвинутые возможности генератора</li><li class="text-muted"><span class="fa-li"><i class="fas fa-times"></i></span>Свои модули</li></ul>'
                 );
-
-            $this->addReference(Subscription::class . '|1', $subscription);
         });
 
         $this->create(Subscription::class, function (Subscription $subscription) use ($manager) {
@@ -35,8 +31,6 @@ class SubscriptionFixtures extends BaseFixtures
                 ->setDescription(
                     '<ul class="fa-ul"><li><span class="fa-li"><i class="fas fa-check"></i></span><strong>Безлимитная генерация статей для вашего аккаунта</strong></li><li><span class="fa-li"><i class="fas fa-check"></i></span>Базовые возможности генератора</li><li><span class="fa-li"><i class="fas fa-check"></i></span>Продвинутые возможности генератора</li><li><span class="fa-li"><i class="fas fa-check"></i></span>Свои модули</li></ul>'
                 );
-
-            $this->addReference(Subscription::class . '|2', $subscription);
         });
 
         $manager->flush();

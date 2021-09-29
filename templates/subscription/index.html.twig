@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="col-xl-8">
-        {% if not(user.subscription.slug == 'free') %}
+        {% if currentSubscription.slug != 'free' %}
             <div class="alert alert-success" role="alert">
                 Подписка Plus оформлена до {{ user.subscriptionLeft | date('d.m.Y') }}
             </div>

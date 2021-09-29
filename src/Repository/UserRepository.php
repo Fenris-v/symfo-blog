@@ -2,7 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Subscription;
 use App\Entity\User;
 use App\Form\Model\PasswordFormModel;
 use App\Form\Model\UserRegistrationFormModel;
@@ -145,19 +144,18 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     /**
      * @param User $user
-     * @param Subscription $subscription
+     * @param string $subscriptionSlug
+     * @param DateTime $dateOfEnd
      * @return User
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function updateSubscription(User $user, Subscription $subscription): User
-    {
-        $dateOfEnd = null;
-        if ($subscription->getSlug() !== Subscription::FREE) {
-            $dateOfEnd = (new DateTime())->modify('+1 week');
-        }
-
-        $user->setSubscription($subscription)->setSubscriptionLeft($dateOfEnd);
+    public function updateSubscriptionLevel(
+        User $user,
+        string $subscriptionSlug,
+        DateTime $dateOfEnd
+    ): User {
+        $user->setSubscription($subscriptionSlug)->setSubscriptionLeft($dateOfEnd);
 
         $this->_em->persist($user);
         $this->_em->flush();

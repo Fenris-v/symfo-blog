@@ -6,7 +6,7 @@
 
 {% block content %}
     <div class="col-xl-8 border-right">
-        {% if daysForEnd < 3 %}
+        {% if subscription.slug != 'free' and daysForEnd < 3 %}
             <div class="alert alert-warning" role="alert">
                 Подписка истекает
                 {% if daysForEnd == 0 %}
@@ -33,7 +33,7 @@
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">{{ user.subscription.name }}</h5>
+                    <h5 class="card-title">{{ subscription.name }}</h5>
                     <p class="card-text">Ваш уровень подписки.</p>
                     {% if canUpdate %}
                         <a href="{{ path('app_subscription') }}" class="btn btn-primary">Улучшить</a>
