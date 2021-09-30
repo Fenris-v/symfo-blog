@@ -2,8 +2,10 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Form\ArticleCreateFormType;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -12,12 +14,26 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ArticlesController extends AbstractController
 {
+    /**
+     * @param Request $request
+     * @return Response
+     */
     #[Route('/articles/create', name: 'app_article_create')]
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return $this->render('base_dashboard.html.twig');
+        $form = $this->createForm(ArticleCreateFormType::class);
+        $form->handleRequest($request);
+
+        return $this->render('dashboard/create_article.html.twig', [
+            'article' => true ?? null,
+            'isLimitEnded' => true,
+            'articleForm' => $form->createView()
+        ]);
     }
 
+    /**
+     * @return Response
+     */
     #[Route('/articles/history', name: 'app_article_history')]
     public function index(): Response
     {
