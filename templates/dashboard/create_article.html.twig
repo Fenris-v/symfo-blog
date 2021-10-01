@@ -6,18 +6,17 @@
 
 {% block content %}
     <div class="row">
-
         <div class="col-xl-6">
             {% if isLimitEnded %}
                 <div class="alert alert-danger" role="alert">
-                    Превышен лимит создания статей, чтобы снять лимит
-                    <a href="{{ path('app_subscription') }}">Улучшите подписку</a>
+                    {{ 'Limit ended' | trans }}
+                    <a href="{{ path('app_subscription') }}">{{ 'Subscription up' | trans }}</a>
                 </div>
             {% endif %}
 
             {{ form_start(articleForm) }}
                 <div class="form-group">
-                    <label for="fieldTheme">Тематика</label>
+                    <label for="fieldTheme">{{ 'Theme' | trans }}</label>
                     <select class="form-control" id="fieldTheme">
                         <option>-</option>
                         <option>Про еду</option>
@@ -30,7 +29,7 @@
                 </div>
                 <div class="card mb-4">
                     <div class="card-body">
-                        <p class="card-title">Ключевое слово</p>
+                        <p class="card-title">{{ 'Keyword' | trans }}</p>
                         <div class="form-label-group">
                             {{ form_widget(articleForm.keyword, { full_name: 'keyword[0]' }) }}
                             {{ form_label(articleForm.keyword) }}
@@ -41,9 +40,9 @@
                                    id="article1Word"
                                    name="keyword[1]"
                                    class="form-control"
-                                   placeholder="Родительный падеж"
+                                   placeholder="{{ 'Genitive' | trans }}"
                                    required>
-                            <label for="article1Word">Родительный падеж</label>
+                            <label for="article1Word">{{ 'Genitive' | trans }}</label>
                         </div>
 
                         <div class="form-label-group">
@@ -51,42 +50,39 @@
                                    id="article2Word"
                                    name="keyword[2]"
                                    class="form-control"
-                                   placeholder="Дательный падеж"
+                                   placeholder="{{ 'Dative' | trans }}"
                                    required>
-                            <label for="article2Word">Дательный падеж</label>
+                            <label for="article2Word">{{ 'Dative' | trans }}</label>
                         </div>
-
 
                         <div class="form-label-group">
                             <input type="text"
                                    id="article3Word"
                                    name="keyword[3]"
                                    class="form-control"
-                                   placeholder="Винительный падеж"
+                                   placeholder="{{ 'Accusative' | trans }}"
                                    required>
-                            <label for="article3Word">Винительный падеж</label>
+                            <label for="article3Word">{{ 'Accusative' | trans }}</label>
                         </div>
-
 
                         <div class="form-label-group">
                             <input type="text"
                                    id="article4Word"
                                    name="keyword[4]"
                                    class="form-control"
-                                   placeholder="Творительный падеж"
+                                   placeholder="{{ 'Instrumental case' | trans }}"
                                    required>
-                            <label for="article4Word">Творительный падеж</label>
+                            <label for="article4Word">{{ 'Instrumental case' | trans }}</label>
                         </div>
-
 
                         <div class="form-label-group">
                             <input type="text"
                                    id="article5Word"
                                    name="keyword[5]"
                                    class="form-control"
-                                   placeholder="Предложный падеж"
+                                   placeholder="{{ 'Prepositional' | trans }}"
                                    required>
-                            <label for="article5Word">Предложный падеж</label>
+                            <label for="article5Word">{{ 'Prepositional' | trans }}</label>
                         </div>
 
                         <div class="form-label-group">
@@ -94,9 +90,9 @@
                                    id="article6Word"
                                    name="keyword[6]"
                                    class="form-control"
-                                   placeholder="Множественное число"
+                                   placeholder="{{ 'Plural' | trans }}"
                                    required>
-                            <label for="article6Word">Множественное число</label>
+                            <label for="article6Word">{{ 'Plural' | trans }}</label>
                         </div>
                     </div>
                 </div>
@@ -118,7 +114,7 @@
 
                 <div class="card mb-4">
                     <div class="card-body">
-                        <p class="card-title">Продвигаемые слова</p>
+                        <p class="card-title">{{ 'Words title' | trans }}</p>
                         <div class="row">
                             <div class="col">
                                 <div class="form-label-group">
@@ -126,8 +122,8 @@
                                            id="word1Field"
                                            name="wordField[1]"
                                            class="form-control"
-                                           placeholder="Продвигаемое слово">
-                                    <label for="word1Field">Продвигаемое слово</label>
+                                           placeholder="{{ 'Words' | trans}}">
+                                    <label for="word1Field">{{ 'Words' | trans}}</label>
                                 </div>
                             </div>
                             <div class="col">
@@ -136,36 +132,13 @@
                                            id="word1CountField"
                                            name="wordCountField[1]"
                                            class="form-control"
-                                           placeholder="кол-во">
-                                    <label for="word1CountField">кол-во</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-label-group">
-                                    <input type="text"
-                                           id="word2Field"
-                                           name="wordField[2]"
-                                           class="form-control"
-                                           placeholder="Продвигаемое слово">
-                                    <label for="word2Field">Продвигаемое слово</label>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-label-group">
-                                    <input type="text"
-                                           id="word2CountField"
-                                           name="wordCountField[2]"
-                                           class="form-control"
-                                           placeholder="кол-во">
-                                    <label for="word2CountField">кол-во</label>
+                                           placeholder="{{ 'Count' | trans}}">
+                                    <label for="word1CountField">{{ 'Count' | trans}}</label>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-
 
                 <div class="form-group">
                     {{ form_label(articleForm.images) }}
@@ -180,7 +153,7 @@
     <hr>
 
     {% if article %}
-        <h2 class="mt-4">Ваша статья</h2>
+        <h2 class="mt-4">{{ 'Your article' | trans}}</h2>
 
         <hr>
 
