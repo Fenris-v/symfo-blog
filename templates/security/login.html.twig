@@ -10,7 +10,7 @@
             <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
                 <div class="card card-signin my-5">
                     <div class="card-body">
-                        <h5 class="card-title text-center">Авторизация</h5>
+                        <h5 class="card-title text-center">{{ 'Auth' | trans }}</h5>
 
                         {% if errors %}
                             {% for error in errors %}
@@ -28,13 +28,13 @@
                                         type="email"
                                         id="inputEmail"
                                         class="form-control"
-                                        placeholder="Ваш Email"
+                                        placeholder="{{ 'Your Email' | trans }}"
                                         required
                                         autofocus
                                         name="email"
                                         value="{{ last_username }}"
                                 >
-                                <label for="inputEmail">Ваш Email</label>
+                                <label for="inputEmail">{{ 'Your Email' | trans }}</label>
                             </div>
 
                             <div class="form-label-group">
@@ -42,11 +42,11 @@
                                         type="password"
                                         id="inputPassword"
                                         class="form-control"
-                                        placeholder="Пароль"
+                                        placeholder="{{ 'Password' | trans }}"
                                         required
                                         name="password"
                                 >
-                                <label for="inputPassword">Пароль</label>
+                                <label for="inputPassword">{{ 'Password' | trans }}</label>
                             </div>
 
                             <div class="custom-control custom-checkbox mb-3">
@@ -57,18 +57,20 @@
                                         name="_remember_me"
                                         {{ app.request.request.get('_remember_me') ? 'checked' : '' }}
                                 >
-                                <label class="custom-control-label" for="customCheck1">Запомнить меня</label>
+                                <label class="custom-control-label"
+                                       for="customCheck1">{{ 'Remember me' | trans }}</label>
                             </div>
-                            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Войти</button>
+                            <button class="btn btn-lg btn-primary btn-block text-uppercase"
+                                    type="submit">{{ 'Login' | trans }}</button>
                             <hr class="my-4">
                             <div class="text-center">
-                                <a href="{{ path('app_reset_password') }}">Забыли пароль?</a>
+                                <a href="{{ path('app_reset_password') }}">{{ 'Forget password' | trans }}</a>
                             </div>
                             <div class="text-center">
-                                <a href="{{ path('app_register') }}">Регистрация</a>
+                                <a href="{{ path('app_register') }}">{{ 'Register' | trans }}</a>
                             </div>
                             <div class="text-center">
-                                <a href="{{ path('app_reactivate') }}">Повторная активация</a>
+                                <a href="{{ path('app_reactivate') }}">{{ 'Activate link' | trans }}</a>
                             </div>
                         </form>
                     </div>

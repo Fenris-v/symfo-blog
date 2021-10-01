@@ -10,7 +10,7 @@
             <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
                 <div class="card card-signin my-5">
                     <div class="card-body">
-                        <h5 class="card-title text-center">Повторная активация</h5>
+                        <h5 class="card-title text-center">{{ 'Activate link' | trans }}</h5>
 
                         {% if errors %}
                             <div class="alert alert-danger" role="alert">
@@ -32,24 +32,24 @@
                                         type="email"
                                         id="inputEmail"
                                         class="form-control"
-                                        placeholder="Ваш Email"
+                                        placeholder="{{ 'Your Email' | trans }}"
                                         required
                                         autofocus
                                         name="email"
                                         value="{{ app.request.request.get('email') }}"
                                 >
-                                <label for="inputEmail">Ваш Email</label>
+                                <label for="inputEmail">{{ 'Your Email' | trans }}</label>
                             </div>
 
                             <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">
-                                Активировать
+                                {{ 'Activate' | trans }}
                             </button>
                             <hr class="my-4">
                             <div class="text-center">
-                                <a href="{{ path('app_login') }}">Войти</a>
+                                <a href="{{ path('app_login') }}">{{ 'Login' | trans }}</a>
                             </div>
                             <div class="text-center">
-                                <a href="{{ path('app_register') }}">Регистрация</a>
+                                <a href="{{ path('app_register') }}">{{ 'Register' | trans }}</a>
                             </div>
                         </form>
                     </div>

@@ -23,28 +23,30 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">13</h5>
-                        <p class="card-text">Всего статей создано.</p>
+                        <p class="card-text">{{ 'Count created articles' | trans }}</p>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">8</h5>
-                        <p class="card-text">Создано в этом месяце.</p>
+                        <p class="card-text">{{ 'Created by mounth' | trans }}</p>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
                         <h5 class="card-title">{{ subscription.name }}</h5>
-                        <p class="card-text">Ваш уровень подписки.</p>
+                        <p class="card-text">{{ 'Subscription level' | trans }}</p>
                         {% if canUpdate %}
-                            <a href="{{ path('app_subscription') }}" class="btn btn-primary">Улучшить</a>
+                            <a href="{{ path('app_subscription') }}" class="btn btn-primary">
+                                {{ 'Up' | trans }}
+                            </a>
                         {% endif %}
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Создать статью</h5>
-                        <a href="{{ path('app_article_create') }}" class="btn btn-primary">Создать</a>
+                        <h5 class="card-title">{{ 'Create article' | trans }}</h5>
+                        <a href="{{ path('app_article_create') }}" class="btn btn-primary">{{ 'Create' | trans }}</a>
                     </div>
                 </div>
                 <div class="card">
@@ -54,7 +56,7 @@
                             его нужными словами <b>круг</b> для вашего бизнеса. Столько <b>круг</b> сколько
                             <b>круг</b> нужно. Хоть все ими <b>круг</b> <b>круг</b> <b>круг</b> заполоните!.
                         </p>
-                        <a href="#" class="btn btn-primary">Подробнее</a>
+                        <a href="#" class="btn btn-primary">{{ 'More' | trans }}</a>
                     </div>
                 </div>
             </div>
