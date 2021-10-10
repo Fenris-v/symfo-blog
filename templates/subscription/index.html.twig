@@ -5,19 +5,21 @@
 {% block h1 %}Подписка{% endblock %}
 
 {% block content %}
-    <div class="col-xl-8">
-        {% if currentSubscription.slug != 'free' %}
-            <div class="alert alert-success" role="alert">
-                Подписка Plus оформлена до {{ user.subscriptionLeft | date('d.m.Y') }}
-            </div>
-        {% endif %}
-
-        <section class="pricing py-2 row">
-            <div class="container">
-                <div class="row">
-                    {% include 'subscription/subscription_list.twig' with subscriptions %}
+    <div class="row">
+        <div class="col-xl-8">
+            {% if currentSubscription.slug != 'free' %}
+                <div class="alert alert-success" role="alert">
+                    Подписка Plus оформлена до {{ user.subscriptionLeft | date('d.m.Y') }}
                 </div>
-            </div>
-        </section>
+            {% endif %}
+
+            <section class="pricing py-2 row">
+                <div class="container">
+                    <div class="row">
+                        {% include 'subscription/subscription_list.twig' with subscriptions %}
+                    </div>
+                </div>
+            </section>
+        </div>
     </div>
 {% endblock %}

@@ -10,7 +10,7 @@
             <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
                 <div class="card card-signin my-5">
                     <div class="card-body">
-                        <h5 class="card-title text-center">Регистрация</h5>
+                        <h5 class="card-title text-center">{{ 'Register' | trans }}</h5>
                         {% if app.session.flashBag.peek('flash_register') | length > 0 %}
                             <div class="alert alert-success" role="alert">
                                 {% for message in app.flashes('flash_register') %}
@@ -49,7 +49,7 @@
                         {{ form_widget(registerForm) }}
                         <hr class="my-4">
                         <div class="text-center">
-                            <a href="{{ path('app_login') }}">Я уже зарегистрирован</a>
+                            <a href="{{ path('app_login') }}">{{ 'Alredy registered' | trans }}</a>
                         </div>
                         {{ form_end(registerForm) }}
                     </div>

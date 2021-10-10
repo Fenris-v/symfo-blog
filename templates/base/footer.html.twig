@@ -3,12 +3,13 @@
     <div class="container">
         <div class="row">
             <div class="col-xl-9 mx-auto">
-                <h2 class="mb-4">Готовы начать? Регистрируйтесь прямо сейчас!</h2>
+                <h2 class="mb-4">{{ 'Offer' | trans }}</h2>
             </div>
             <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
                 <div class="form-row">
                     <div class="col-12 col-md-6 mx-auto">
-                        <a href="{{ path('app_register') }}" class="btn btn-block btn-lg btn-primary">Регистрация</a>
+                        <a href="{{ path('app_register') }}"
+                           class="btn btn-block btn-lg btn-primary">{{ 'Register' | trans }}</a>
                     </div>
                 </div>
             </div>
@@ -20,7 +21,7 @@
     <div class="container">
         <div class="row">
             <div class="col-lg-6 h-100 text-center text-lg-left my-auto">
-                <p class="text-muted small mb-4 mb-lg-0">&copy; BlaBlaArticle 2020.</p>
+                <p class="text-muted small mb-4 mb-lg-0">&copy; {{ sitename }} {{ 'now'|date('Y') }}.</p>
             </div>
             <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
                 <ul class="list-inline mb-0">

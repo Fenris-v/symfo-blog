@@ -6,3 +6,4 @@ import 'bootstrap';
 import 'jquery-easing';
 import './js/scripts';
 import './js/dashboard';
+import './js/add_field';

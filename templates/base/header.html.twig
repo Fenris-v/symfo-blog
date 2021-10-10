@@ -1,9 +1,9 @@
 <nav class="navbar navbar-light bg-light static-top">
   <div class="container">
-    <span class="navbar-brand">BlaBlaArticle</span>
-    <a class="js-scroll-trigger" href="#services">Сервисы</a>
-    <a class="js-scroll-trigger" href="#author">Автор</a>
-    <a class="btn btn-primary" href="{{ path('app_login') }}">Войти</a>
+    <span class="navbar-brand">{{ sitename }}</span>
+    <a class="js-scroll-trigger" href="#services">{{ 'Services' | trans }}</a>
+    <a class="js-scroll-trigger" href="#author">{{ 'Author' | trans }}</a>
+    <a class="btn btn-primary" href="{{ path('app_login') }}">{{ 'Login' | trans }}</a>
   </div>
 </nav>
 
@@ -12,13 +12,12 @@
   <div class="container">
     <div class="row">
       <div class="col-xl-9 mx-auto">
-        <h1 class="mb-5">Создай уникальную статью идеально подходящую для вашего бизнеса, сайта или
-          проекта!</h1>
+        <h1 class="mb-5">{{ 'Service short desc' | trans }}</h1>
       </div>
       <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
         <div class="form-row">
           <div class="col-12 col-md-6 mx-auto">
-            <a type="submit" class="btn btn-block btn-lg btn-primary" href="try.html">Попробовать</a>
+            <a type="submit" class="btn btn-block btn-lg btn-primary" href="try.html">{{ 'Try' | trans }}</a>
           </div>
         </div>
       </div>
