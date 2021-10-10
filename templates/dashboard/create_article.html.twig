@@ -15,115 +15,116 @@
             {% endif %}
 
             {{ form_start(articleForm) }}
-                <div class="form-group">
-                    <label for="fieldTheme">{{ 'Theme' | trans }}</label>
-                    <select class="form-control" id="fieldTheme">
-                        <option>-</option>
-                        <option>Про еду</option>
-                        <option>Про PHP</option>
-                    </select>
-                </div>
-                <div class="form-label-group">
-                    {{ form_widget(articleForm.title) }}
-                    {{ form_label(articleForm.title) }}
-                </div>
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <p class="card-title">{{ 'Keyword' | trans }}</p>
-                        <div class="form-label-group">
-                            {{ form_widget(articleForm.keyword, { full_name: 'keyword[0]' }) }}
-                            {{ form_label(articleForm.keyword) }}
-                        </div>
+            <div class="form-group">
+                <label for="fieldTheme">{{ 'Theme' | trans }}</label>
+                <select class="form-control" id="fieldTheme">
+                    <option>-</option>
+                    <option>Про еду</option>
+                    <option>Про PHP</option>
+                </select>
+            </div>
+            <div class="form-label-group">
+                {{ form_widget(articleForm.title) }}
+                {{ form_label(articleForm.title) }}
+            </div>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p class="card-title">{{ 'Keyword' | trans }}</p>
+                    <div class="form-label-group">
+                        {{ form_widget(articleForm.keyword, { full_name: 'keyword[0]' }) }}
+                        {{ form_label(articleForm.keyword) }}
+                    </div>
 
-                        <div class="form-label-group">
-                            <input type="text"
-                                   id="article1Word"
-                                   name="keyword[1]"
-                                   class="form-control"
-                                   placeholder="{{ 'Genitive' | trans }}"
-                                   required>
-                            <label for="article1Word">{{ 'Genitive' | trans }}</label>
-                        </div>
+                    <div class="form-label-group">
+                        <input type="text"
+                               id="article1Word"
+                               name="keyword[1]"
+                               class="form-control"
+                               placeholder="{{ 'Genitive' | trans }}"
+                               required>
+                        <label for="article1Word">{{ 'Genitive' | trans }}</label>
+                    </div>
 
-                        <div class="form-label-group">
-                            <input type="text"
-                                   id="article2Word"
-                                   name="keyword[2]"
-                                   class="form-control"
-                                   placeholder="{{ 'Dative' | trans }}"
-                                   required>
-                            <label for="article2Word">{{ 'Dative' | trans }}</label>
-                        </div>
+                    <div class="form-label-group">
+                        <input type="text"
+                               id="article2Word"
+                               name="keyword[2]"
+                               class="form-control"
+                               placeholder="{{ 'Dative' | trans }}"
+                               required>
+                        <label for="article2Word">{{ 'Dative' | trans }}</label>
+                    </div>
 
-                        <div class="form-label-group">
-                            <input type="text"
-                                   id="article3Word"
-                                   name="keyword[3]"
-                                   class="form-control"
-                                   placeholder="{{ 'Accusative' | trans }}"
-                                   required>
-                            <label for="article3Word">{{ 'Accusative' | trans }}</label>
-                        </div>
+                    <div class="form-label-group">
+                        <input type="text"
+                               id="article3Word"
+                               name="keyword[3]"
+                               class="form-control"
+                               placeholder="{{ 'Accusative' | trans }}"
+                               required>
+                        <label for="article3Word">{{ 'Accusative' | trans }}</label>
+                    </div>
 
-                        <div class="form-label-group">
-                            <input type="text"
-                                   id="article4Word"
-                                   name="keyword[4]"
-                                   class="form-control"
-                                   placeholder="{{ 'Instrumental case' | trans }}"
-                                   required>
-                            <label for="article4Word">{{ 'Instrumental case' | trans }}</label>
-                        </div>
+                    <div class="form-label-group">
+                        <input type="text"
+                               id="article4Word"
+                               name="keyword[4]"
+                               class="form-control"
+                               placeholder="{{ 'Instrumental case' | trans }}"
+                               required>
+                        <label for="article4Word">{{ 'Instrumental case' | trans }}</label>
+                    </div>
 
-                        <div class="form-label-group">
-                            <input type="text"
-                                   id="article5Word"
-                                   name="keyword[5]"
-                                   class="form-control"
-                                   placeholder="{{ 'Prepositional' | trans }}"
-                                   required>
-                            <label for="article5Word">{{ 'Prepositional' | trans }}</label>
-                        </div>
+                    <div class="form-label-group">
+                        <input type="text"
+                               id="article5Word"
+                               name="keyword[5]"
+                               class="form-control"
+                               placeholder="{{ 'Prepositional' | trans }}"
+                               required>
+                        <label for="article5Word">{{ 'Prepositional' | trans }}</label>
+                    </div>
 
-                        <div class="form-label-group">
-                            <input type="text"
-                                   id="article6Word"
-                                   name="keyword[6]"
-                                   class="form-control"
-                                   placeholder="{{ 'Plural' | trans }}"
-                                   required>
-                            <label for="article6Word">{{ 'Plural' | trans }}</label>
-                        </div>
+                    <div class="form-label-group">
+                        <input type="text"
+                               id="article6Word"
+                               name="keyword[6]"
+                               class="form-control"
+                               placeholder="{{ 'Plural' | trans }}"
+                               required>
+                        <label for="article6Word">{{ 'Plural' | trans }}</label>
                     </div>
                 </div>
+            </div>
 
-                <div class="row">
-                    <div class="col">
-                        <div class="form-label-group">
-                            {{ form_widget(articleForm.sizeFrom) }}
-                            {{ form_label(articleForm.sizeFrom) }}
-                        </div>
-                    </div>
-                    <div class="col">
-                        <div class="form-label-group">
-                            {{ form_widget(articleForm.sizeTo) }}
-                            {{ form_label(articleForm.sizeTo) }}
-                        </div>
+            <div class="row">
+                <div class="col">
+                    <div class="form-label-group">
+                        {{ form_widget(articleForm.sizeFrom) }}
+                        {{ form_label(articleForm.sizeFrom) }}
                     </div>
                 </div>
+                <div class="col">
+                    <div class="form-label-group">
+                        {{ form_widget(articleForm.sizeTo) }}
+                        {{ form_label(articleForm.sizeTo) }}
+                    </div>
+                </div>
+            </div>
 
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <p class="card-title">{{ 'Words title' | trans }}</p>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p class="card-title">{{ 'Words title' | trans }}</p>
+                    <div id="wordsContainer">
                         <div class="row">
                             <div class="col">
                                 <div class="form-label-group">
                                     <input type="text"
                                            id="word1Field"
                                            name="wordField[1]"
-                                           class="form-control"
-                                           placeholder="{{ 'Words' | trans}}">
-                                    <label for="word1Field">{{ 'Words' | trans}}</label>
+                                           class="form-control word-input"
+                                           placeholder="{{ 'Word' | trans }}">
+                                    <label for="word1Field">{{ 'Word' | trans }}</label>
                                 </div>
                             </div>
                             <div class="col">
@@ -131,21 +132,23 @@
                                     <input type="text"
                                            id="word1CountField"
                                            name="wordCountField[1]"
-                                           class="form-control"
-                                           placeholder="{{ 'Count' | trans}}">
-                                    <label for="word1CountField">{{ 'Count' | trans}}</label>
+                                           class="form-control count-input"
+                                           placeholder="{{ 'Count' | trans }}">
+                                    <label for="word1CountField">{{ 'Count' | trans }}</label>
                                 </div>
                             </div>
                         </div>
                     </div>
+                    <button id="addWord" class="btn btn-primary">Добавить слово</button>
                 </div>
+            </div>
 
-                <div class="form-group">
-                    {{ form_label(articleForm.images) }}
-                    {{ form_widget(articleForm.images) }}
-                </div>
+            <div class="form-group">
+                {{ form_label(articleForm.images) }}
+                {{ form_widget(articleForm.images) }}
+            </div>
 
-                <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" disabled>Создать</button>
+            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" disabled>Создать</button>
             {{ form_end(articleForm) }}
         </div>
     </div>
@@ -153,7 +156,7 @@
     <hr>
 
     {% if article %}
-        <h2 class="mt-4">{{ 'Your article' | trans}}</h2>
+        <h2 class="mt-4">{{ 'Your article' | trans }}</h2>
 
         <hr>
 
