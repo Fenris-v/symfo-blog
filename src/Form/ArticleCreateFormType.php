@@ -5,6 +5,8 @@ namespace App\Form;
 use App\Form\Model\ArticleCreateFormModel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\NumberType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -19,10 +21,10 @@ class ArticleCreateFormType extends AbstractType
             ->add('title', null, [
                 'attr' => ['placeholder' => 'Title'],
             ])
-            ->add('sizeFrom', null, [
+            ->add('sizeFrom', IntegerType::class, [
                 'attr' => ['placeholder' => 'Size from']
             ])
-            ->add('sizeTo', null, [
+            ->add('sizeTo', IntegerType::class, [
                 'attr' => ['placeholder' => 'Size to']
             ])
             ->add('images', FileType::class, [
