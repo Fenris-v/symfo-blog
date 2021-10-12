@@ -23,6 +23,7 @@
                     <option>Про PHP</option>
                 </select>
             </div>
+            {{ form_errors(articleForm.title) }}
             <div class="form-label-group">
                 {{ form_widget(articleForm.title) }}
                 {{ form_label(articleForm.title) }}
@@ -30,6 +31,7 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <p class="card-title">{{ 'Keyword' | trans }}</p>
+                    {{ form_errors(articleForm.keyword) }}
                     <div class="form-label-group">
                         {{ form_widget(articleForm.keyword, { full_name: 'keyword[0]' }) }}
                         {{ form_label(articleForm.keyword) }}
@@ -99,12 +101,14 @@
 
             <div class="row">
                 <div class="col">
+                    {{ form_errors(articleForm.sizeFrom) }}
                     <div class="form-label-group">
                         {{ form_widget(articleForm.sizeFrom) }}
                         {{ form_label(articleForm.sizeFrom) }}
                     </div>
                 </div>
                 <div class="col">
+                    {{ form_errors(articleForm.sizeTo) }}
                     <div class="form-label-group">
                         {{ form_widget(articleForm.sizeTo) }}
                         {{ form_label(articleForm.sizeTo) }}
@@ -129,7 +133,7 @@
                             </div>
                             <div class="col">
                                 <div class="form-label-group">
-                                    <input type="text"
+                                    <input type="number"
                                            id="word1CountField"
                                            name="wordCountField[1]"
                                            class="form-control count-input"
@@ -144,11 +148,12 @@
             </div>
 
             <div class="form-group">
+                {{ form_errors(articleForm.images) }}
                 {{ form_label(articleForm.images) }}
                 {{ form_widget(articleForm.images) }}
             </div>
 
-            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" disabled>Создать</button>
+            <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Создать</button>
             {{ form_end(articleForm) }}
         </div>
     </div>

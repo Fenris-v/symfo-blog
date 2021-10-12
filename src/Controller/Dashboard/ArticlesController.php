@@ -24,8 +24,12 @@ class ArticlesController extends AbstractController
         $form = $this->createForm(ArticleCreateFormType::class);
         $form->handleRequest($request);
 
+        if ($form->isSubmitted() && $form->isValid()) {
+            $article = $form->getData();
+        }
+
         return $this->render('dashboard/create_article.html.twig', [
-            'article' => true ?? null,
+            'article' => $article ?? null,
             'isLimitEnded' => true,
             'articleForm' => $form->createView()
         ]);

@@ -7,6 +7,7 @@ $(document).ready(() => {
             .find('.word-input')
             .attr('id', 'word' + number + 'Field')
             .attr('name', 'wordField[' + number + ']')
+            .val(null)
             .siblings('label')
             .attr('for', 'word' + number + 'Field');
 
@@ -14,6 +15,7 @@ $(document).ready(() => {
             .find('.count-input')
             .attr('id', 'word' + number + 'CountField')
             .attr('name', 'wordCountField[' + number + ']')
+            .val(null)
             .siblings('label')
             .attr('for', 'word' + number + 'CountField');
     });
