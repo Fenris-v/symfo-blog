@@ -2,7 +2,10 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Entity\Theme;
 use App\Form\ArticleCreateFormType;
+use App\Repository\ThemeRepository;
+use App\Service\ArticleGenerator;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,22 +19,34 @@ class ArticlesController extends AbstractController
 {
     /**
      * @param Request $request
+     * @param ArticleGenerator $articleGenerator
+     * @param ThemeRepository $themeRepository
      * @return Response
      */
     #[Route('/articles/create', name: 'app_article_create')]
-    public function create(Request $request): Response
-    {
+    public function create(
+        Request $request,
+        ArticleGenerator $articleGenerator,
+        ThemeRepository $themeRepository
+    ): Response {
         $form = $this->createForm(ArticleCreateFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $article = $form->getData();
+        if ($request->request->all()) {
+            $data = $request->request->get('article_create_form');
+            $article = $articleGenerator->getArticle($data ?? []);
+
+            $article = $this->get('twig')
+                ->createTemplate($article)
+                ?->render(['keyword' => $data['keyword']]);
         }
 
         return $this->render('dashboard/create_article.html.twig', [
-            'article' => $article ?? null,
             'isLimitEnded' => true,
-            'articleForm' => $form->createView()
+            'themes' => $themeRepository->findAll(),
+            'articleForm' => $form->createView(),
+            'keyword' => $data['keyword'] ?? [],
+            'article' => $article ?? null
         ]);
     }
 

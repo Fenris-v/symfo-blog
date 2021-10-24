@@ -62,6 +62,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $subscriptionLeft;
 
+    /**
+     * @ORM\OneToMany(targetEntity=GeneratorHistory::class, mappedBy="user", orphanRemoval=true)
+     */
+    private $articles;
+
+    public function __construct()
+    {
+        $this->articles = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -180,6 +190,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSubscriptionLeft(?\DateTimeInterface $subscriptionLeft): self
     {
         $this->subscriptionLeft = $subscriptionLeft;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|GeneratorHistory[]
+     */
+    public function getArticles(): Collection
+    {
+        return $this->articles;
+    }
+
+    public function addArticle(GeneratorHistory $article): self
+    {
+        if (!$this->articles->contains($article)) {
+            $this->articles[] = $article;
+            $article->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeArticle(GeneratorHistory $article): self
+    {
+        if ($this->articles->removeElement($article)) {
+            // set the owning side to null (unless already changed)
+            if ($article->getUser() === $this) {
+                $article->setUser(null);
+            }
+        }
 
         return $this;
     }

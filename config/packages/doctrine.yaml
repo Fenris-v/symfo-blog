@@ -13,6 +13,9 @@ doctrine:
       softdeleteable:
         class: Gedmo\SoftDeleteable\Filter\SoftDeleteableFilter
         enabled: true
+    dql:
+      numeric_functions:
+        rand: DoctrineExtensions\Query\Mysql\Rand
     mappings:
       App:
         is_bundle: false
