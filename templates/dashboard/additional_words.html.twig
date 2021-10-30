@@ -1,0 +1,28 @@
+<div class="row">
+    <div class="col">
+        <div class="form-label-group">
+            <input type="text"
+                   id="word1Field"
+                   name="article_create_form[wordField][1]"
+                   class="form-control word-input"
+                    {% if word is defined %}
+                        value="{{ word }}"
+                    {% endif %}
+                   placeholder="{{ 'Word' | trans }}">
+            <label for="word1Field">{{ 'Word' | trans }}</label>
+        </div>
+    </div>
+    <div class="col">
+        <div class="form-label-group">
+            <input type="number"
+                   id="word1CountField"
+                   name="article_create_form[wordCountField][1]"
+                   class="form-control count-input"
+                    {% if app.request.request.get('article_create_form')['wordCountField'] is defined %}
+                        value="{{ app.request.request.get('article_create_form')['wordCountField'][loop.index] }}"
+                    {% endif %}
+                   placeholder="{{ 'Count' | trans }}">
+            <label for="word1CountField">{{ 'Count' | trans }}</label>
+        </div>
+    </div>
+</div>

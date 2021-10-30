@@ -195,7 +195,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection|GeneratorHistory[]
+     * @return Collection
      */
     public function getArticles(): Collection
     {

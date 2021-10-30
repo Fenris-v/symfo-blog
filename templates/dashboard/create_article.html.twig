@@ -18,9 +18,9 @@
             <div class="form-group">
                 <label for="fieldTheme">{{ 'Theme' | trans }}</label>
                 <select class="form-control" id="fieldTheme" name="article_create_form[theme]">
-                    <option value="">-</option>
                     {% for theme in themes %}
-                        <option value="{{ theme.id }}">{{ theme.name }}</option>
+                        <option {% if(loop.index == 0) %}selected{% endif %}
+                                value="{{ theme.slug }}">{{ theme.name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -32,20 +32,20 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <p class="card-title">{{ 'Keyword' | trans }}</p>
+                    {{ form_errors(articleForm.keyword) }}
                     <div class="form-label-group">
-                        <input type="text"
-                               id="article0Word"
-                               name="article_create_form[keyword][0]"
-                               class="form-control"
-                               placeholder="{{ 'Keyword' | trans }}">
-                        <label for="article0Word">{{ 'Keyword' | trans }}</label>
+                        {{ form_widget(articleForm.keyword) }}
+                        {{ form_label(articleForm.keyword) }}
                     </div>
 
                     <div class="form-label-group">
                         <input type="text"
                                id="article1Word"
-                               name="article_create_form[keyword][1]"
+                               name="article_create_form[declination][1]"
                                class="form-control"
+                                {% if app.request.request.get('article_create_form')['declination'][1] is defined %}
+                                    value="{{ app.request.request.get('article_create_form')['declination'][1] }}"
+                                {% endif %}
                                placeholder="{{ 'Genitive' | trans }}">
                         <label for="article1Word">{{ 'Genitive' | trans }}</label>
                     </div>
@@ -53,8 +53,11 @@
                     <div class="form-label-group">
                         <input type="text"
                                id="article2Word"
-                               name="article_create_form[keyword][2]"
+                               name="article_create_form[declination][2]"
                                class="form-control"
+                                {% if app.request.request.get('article_create_form')['declination'][2] is defined %}
+                                    value="{{ app.request.request.get('article_create_form')['declination'][2] }}"
+                                {% endif %}
                                placeholder="{{ 'Dative' | trans }}">
                         <label for="article2Word">{{ 'Dative' | trans }}</label>
                     </div>
@@ -62,8 +65,11 @@
                     <div class="form-label-group">
                         <input type="text"
                                id="article3Word"
-                               name="article_create_form[keyword][3]"
+                               name="article_create_form[declination][3]"
                                class="form-control"
+                                {% if app.request.request.get('article_create_form')['declination'][3] is defined %}
+                                    value="{{ app.request.request.get('article_create_form')['declination'][3] }}"
+                                {% endif %}
                                placeholder="{{ 'Accusative' | trans }}">
                         <label for="article3Word">{{ 'Accusative' | trans }}</label>
                     </div>
@@ -71,8 +77,11 @@
                     <div class="form-label-group">
                         <input type="text"
                                id="article4Word"
-                               name="article_create_form[keyword][4]"
+                               name="article_create_form[declination][4]"
                                class="form-control"
+                                {% if app.request.request.get('article_create_form')['declination'][4] is defined %}
+                                    value="{{ app.request.request.get('article_create_form')['declination'][4] }}"
+                                {% endif %}
                                placeholder="{{ 'Instrumental case' | trans }}">
                         <label for="article4Word">{{ 'Instrumental case' | trans }}</label>
                     </div>
@@ -80,8 +89,11 @@
                     <div class="form-label-group">
                         <input type="text"
                                id="article5Word"
-                               name="article_create_form[keyword][5]"
+                               name="article_create_form[declination][5]"
                                class="form-control"
+                                {% if app.request.request.get('article_create_form')['declination'][5] is defined %}
+                                    value="{{ app.request.request.get('article_create_form')['declination'][5] }}"
+                                {% endif %}
                                placeholder="{{ 'Prepositional' | trans }}">
                         <label for="article5Word">{{ 'Prepositional' | trans }}</label>
                     </div>
@@ -89,8 +101,11 @@
                     <div class="form-label-group">
                         <input type="text"
                                id="article6Word"
-                               name="article_create_form[keyword][6]"
+                               name="article_create_form[declination][6]"
                                class="form-control"
+                                {% if app.request.request.get('article_create_form')['declination'][6] is defined %}
+                                    value="{{ app.request.request.get('article_create_form')['declination'][6] }}"
+                                {% endif %}
                                placeholder="{{ 'Plural' | trans }}">
                         <label for="article6Word">{{ 'Plural' | trans }}</label>
                     </div>
@@ -118,28 +133,13 @@
                 <div class="card-body">
                     <p class="card-title">{{ 'Words title' | trans }}</p>
                     <div id="wordsContainer">
-                        <div class="row">
-                            <div class="col">
-                                <div class="form-label-group">
-                                    <input type="text"
-                                           id="word1Field"
-                                           name="article_create_form[wordField][1]"
-                                           class="form-control word-input"
-                                           placeholder="{{ 'Word' | trans }}">
-                                    <label for="word1Field">{{ 'Word' | trans }}</label>
-                                </div>
-                            </div>
-                            <div class="col">
-                                <div class="form-label-group">
-                                    <input type="number"
-                                           id="word1CountField"
-                                           name="article_create_form[wordCountField][1]"
-                                           class="form-control count-input"
-                                           placeholder="{{ 'Count' | trans }}">
-                                    <label for="word1CountField">{{ 'Count' | trans }}</label>
-                                </div>
-                            </div>
-                        </div>
+                        {% if app.request.request.get('article_create_form')['wordField'] is defined %}
+                            {% for word in app.request.request.get('article_create_form')['wordField'] %}
+                                {% include 'dashboard/additional_words.html.twig' with {'word': word} %}
+                            {% endfor %}
+                        {% else %}
+                            {% include 'dashboard/additional_words.html.twig' %}
+                        {% endif %}
                     </div>
                     <button id="addWord" class="btn btn-primary">Добавить слово</button>
                 </div>

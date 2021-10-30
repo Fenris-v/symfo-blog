@@ -74,7 +74,7 @@ class Theme
     }
 
     /**
-     * @return Collection|TextTemplate[]
+     * @return Collection
      */
     public function getTexts(): Collection
     {

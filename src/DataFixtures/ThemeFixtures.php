@@ -9,7 +9,7 @@ class ThemeFixtures extends BaseFixtures
 {
     public function loadData(ObjectManager $manager): void
     {
-        $this->createMany(Theme::class, 10, function (Theme $theme) {
+        $this->createMany(Theme::class, 5, function (Theme $theme) {
             $theme->setName($this->faker->words(3, true));
         });
 

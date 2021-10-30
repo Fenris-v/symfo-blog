@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\TextTemplate;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -21,14 +22,30 @@ class TextTemplateRepository extends ServiceEntityRepository
 
     /**
      * @return TextTemplate
+     * @throws NonUniqueResultException
      */
     public function getRandom(): TextTemplate
     {
         return $this->createQueryBuilder('t')
-            ->addSelect('t')
             ->orderBy('RAND()')
-            ->setMaxResults(1)
             ->getQuery()
-            ->getResult()[0];
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Возвращает параграфы по теме в указанном количестве
+     * @param int $count
+     * @param int $themeId
+     * @return int|mixed|string
+     */
+    public function getRandomParagraphs(int $count, int $themeId)
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.theme=:theme')
+            ->setParameter('theme', $themeId)
+            ->orderBy('RAND()')
+            ->setMaxResults($count)
+            ->getQuery()
+            ->getResult();
     }
 }

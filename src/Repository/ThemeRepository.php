@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Theme;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,5 +18,20 @@ class ThemeRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Theme::class);
+    }
+
+    /**
+     * @param string $slug
+     * @return int|mixed|string|null
+     * @throws NonUniqueResultException
+     */
+    public function getBySlug(string $slug)
+    {
+        return $this->createQueryBuilder('t')
+            ->addSelect('t')
+            ->where('t.slug=:slug')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

@@ -36,11 +36,15 @@ class Subscription
 
     /**
      * Возвращает подписку
-     * @param User $user
-     * @return SubscriptionModel
+     * @param User|null $user
+     * @return SubscriptionModel|null
      */
-    public function getSubscription(User $user): SubscriptionModel
+    public function getSubscription(?User $user): ?SubscriptionModel
     {
+        if ($user === null) {
+            return null;
+        }
+
         if ($user->getSubscription() && $this->isActive($user)) {
             return $this->subscriptionRepository
                 ->findOneBy(['slug' => $user->getSubscription()]);

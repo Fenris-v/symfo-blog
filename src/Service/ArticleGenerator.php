@@ -2,7 +2,13 @@
 
 namespace App\Service;
 
+use App\Entity\TextTemplate;
 use App\Repository\TextTemplateRepository;
+use App\Repository\ThemeRepository;
+use App\Entity\Theme;
+use Doctrine\ORM\NonUniqueResultException;
+use Exception;
+use Symfony\Component\Security\Core\Security;
 
 class ArticleGenerator
 {
@@ -14,24 +20,150 @@ class ArticleGenerator
     // {{ paragraphs }} - для вставки случайного количества параграфов от 1 до 3, при этом теги <p> устанавливаются автоматически
     // {{ imageSrc }} - путь к картинке, предполагается использовать внутри тегов <img>
 
-//<p>Купить тесто в ближайшем магазине сегодня не составляет ни малейшей проблемы, а вот какую начинку приготовить для планируемого {{ keyword | morph(1) }}? Часто у хозяек, особенно молодых, просто не хватает опыта и знаний, как превратить обычные продукты в ароматное и невероятно вкусное содержимое выпечки. Вот несколько простых подсказок…</p>
-//<p>Капустная начинка</p>
-//<p>Свежую капусту мелко нашинковать; в глубокую сковороду налить немного подсолнечного масла и треть чайной чашки воды. Поставить сковороду на средний огонь, выложить капусту, чуть-чуть посолить и, помешивая, тушить до того момента, пока не выкипит вся вода. Потом добавить 50 г сливочного масла, чуть остудить и разложить на приготовленные сочни. В идеале, капуста должна чуть похрустывать: окончательно она «дойдет» уже в {{ keyword | morph(5) }}, на растеряв своего вкуса и полезных качеств. Можно добавить в приготовленную капустную начинку рубленое круто сваренное яйцо.</p>
-//<p>Рыбная начинка</p>
-//<p>Для {{ keyword | morph(1) }} с рыбой совершенно не обязательно покупать дорогое рыбное филе. Купите обычные тушки без головы, подойдет практически любой вид рыбы, начиная от минтая. Промойте рыбу, выложите на сковороду, добавьте немного воды, закройте крышкой и держите на небольшом огне, пока мясо не начнет отставать от костей. Затем остудите тушки и аккуратно выньте косточки; главное, не передержать рыбу на сковородке, иначе в {{ keyword | morph(5) }} она превратится в кашу. В отдельной кастрюле сварите немного риса (можно использовать рис в пакетиках для варки, продающийся в супермаркетах), отлейте и чуть подсушите. Перемешайте рис с подготовленной рыбой, и только после этого посолите.</p>
-//<p>Ягодная начинка</p>
-//<p>Летом хозяйки пекут ягодный {{ keyword | morph(0) }} охотно и часто, а вот как быть зимой и весной? Практически в каждом доме в морозильной камере хранятся замороженные ягоды – клубника, вишня, малина; если у Вас нет собственного сада, пакет-заморозку можно купить в магазине. Но у размороженных ягод есть крупный недостаток: как правило, они дают обильный сок, и {{ keyword | morph(6) }} получаются «мокрыми». Не расстраивайтесь: положите оттаивающие ягоды в пластиковый дуршлаг или сито, и дайте стечь соку. Затем разложите будущую начинку на противне и на 15-20 минут поставьте в духовку, нагретую до 100оС. Ягоды подсохнут, приобретут приятный, чуть пряный вкус; непосредственно перед тем, как распределять начинку по {{ keyword | morph(2) }}, добавьте немного сахара или меда.</p>
+    private ?\App\Entity\Subscription $subscription;
 
-    public function __construct(private TextTemplateRepository $textTemplateRepository)
-    {
+    public function __construct(
+        private TextTemplateRepository $textTemplateRepository,
+        private ThemeRepository $themeRepository,
+        Subscription $subscription,
+        Security $security,
+        private GeneratorHistory $generatorHistory
+    ) {
+        $this->subscription = $subscription->getSubscription($security->getUser());
     }
 
     /**
      * @param array $data
      * @return string|null
+     * @throws NonUniqueResultException
+     * @throws Exception
      */
     public function getArticle(array $data): ?string
     {
-        return $this->textTemplateRepository->getRandom()->getTemplate();
+        /** @var Theme $theme */
+        $theme = $this->themeRepository->getBySlug($data['theme']);
+        if (empty($theme)) {
+            throw new Exception('Тема не найдена, проверьте корректность ввода');
+        }
+
+        $paragraphs = $this->getParagraphs($theme, $data);
+        $article = $this->getHtml($paragraphs);
+        $article = $this->pasteWords($article, $data);
+        $article = $this->setTitle($article, $data);
+
+        $this->generatorHistory->save($article, $data);
+
+        return $article;
+    }
+
+    /**
+     * @param array $data
+     * @param string $article
+     * @return string
+     * @throws Exception
+     */
+    private function pasteWords(string $article, array $data = []): string
+    {
+        if (!isset($data['wordField'])) {
+            return $article;
+        }
+
+        if ($this->subscription->getSlug() !== \App\Entity\Subscription::LEVELS['max']) {
+            return $this->pasteWord(
+                $article,
+                $data['wordField'][array_key_first($data['wordField'])],
+                $data['wordCountField'][array_key_first($data['wordCountField'])] ?? 0
+            );
+        }
+
+        foreach ($data['wordField'] as $key => $word) {
+            $article = $this->pasteWord(
+                $article,
+                $word,
+                $data['wordCountField'][$key] ?? 0
+            );
+        }
+
+        return $article;
+    }
+
+    /**
+     * @param array $paragraphs
+     * @return string
+     */
+    private function getHtml(array $paragraphs): string
+    {
+        $html = '';
+        /** @var TextTemplate $paragraph */
+        foreach ($paragraphs as $paragraph) {
+            $html .= "<p>{$paragraph->getTemplate()}</p>";
+        }
+
+        return $html;
+    }
+
+    /**
+     * @param string $article
+     * @param array $data
+     * @return string
+     */
+    private function setTitle(string $article, array $data = []): string
+    {
+        if (!isset($data['title'])) {
+            return $article;
+        }
+
+        return "<h1>{$data['title']}</h1>$article";
+    }
+
+    /**
+     * @param string $article
+     * @param string $word
+     * @param int $count
+     * @return string
+     * @throws Exception
+     */
+    private function pasteWord(string $article, string $word, int $count): string
+    {
+        $text = explode(' ', $article);
+        $length = count($text) - 1;
+
+        if ($count >= $length) {
+            throw new Exception('Задано слишком много повторений слова');
+        }
+
+        for ($i = 0; $i < $count; $i++) {
+            $key = rand(1, $length);
+
+            while (str_contains($text[$key], $word)) {
+                $key = rand(1, $length);
+            }
+
+            $text[$key] = "$word $text[$key]";
+        }
+
+        return implode(' ', $text);
+    }
+
+    /**
+     * @param Theme $theme
+     * @param array $data
+     * @return array
+     * @throws Exception
+     */
+    private function getParagraphs(Theme $theme, array $data = []): array
+    {
+        // todo: заменить количество параграфов на количество модулей, после реализации самих модулей
+        $paragraphs = $this->textTemplateRepository
+            ->getRandomParagraphs(
+                rand($data['sizeFrom'], $data['sizeTo']),
+                $theme->getId()
+            );
+
+        if (is_null($paragraphs)) {
+            throw new Exception('Не найдено ни одного параметра подходящей темы');
+        }
+
+        return $paragraphs;
     }
 }
