@@ -2,6 +2,7 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Dto\Factory\ArticleGeneratorDtoFactory;
 use App\Form\ArticleCreateFormType;
 use App\Repository\ThemeRepository;
 use App\Service\ArticleGenerator;
@@ -37,18 +38,20 @@ class ArticlesController extends AbstractController
         $form = $this->createForm(ArticleCreateFormType::class);
         $form->handleRequest($request);
 
-        if ($request->request->all()) {
-            $article = $this->getArticle(
-                $articleGenerator,
-                $request->request->get('article_create_form') ?? []
-            );
+        /** @var array $data */
+        if ($data = $request->request->get('article_create_form')) {
+            $dto = ArticleGeneratorDtoFactory::createFromArray($data);
+
+            $article = $this->get('twig')
+                ->createTemplate($articleGenerator->getArticle($dto))
+                ?->render(['keyword' => $dto->keyword ?? '']);
         }
 
         return $this->render('dashboard/create_article.html.twig', [
             'isLimitEnded' => true,
             'themes' => $themeRepository->findAll(),
             'articleForm' => $form->createView(),
-            'keyword' => $data['keyword'] ?? '',
+            'dto' => $dto ?? null,
             'article' => $article ?? null
         ]);
     }
@@ -60,24 +63,5 @@ class ArticlesController extends AbstractController
     public function index(): Response
     {
         return $this->render('base_dashboard.html.twig');
-    }
-
-    /**
-     * @param ArticleGenerator $articleGenerator
-     * @param array $data
-     * @return string
-     * @throws LoaderError
-     * @throws NonUniqueResultException
-     * @throws SyntaxError
-     */
-    private function getArticle(ArticleGenerator $articleGenerator, array $data): string
-    {
-        $article = $articleGenerator->getArticle($data ?? []);
-
-        array_unshift($data['declination'], $data['keyword']);
-
-        return $this->get('twig')
-            ->createTemplate($article)
-            ?->render(['keyword' => $data['declination']]);
     }
 }

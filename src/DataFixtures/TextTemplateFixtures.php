@@ -13,6 +13,9 @@ class TextTemplateFixtures extends BaseFixtures implements DependentFixtureInter
     {
     }
 
+    /**
+     * @param ObjectManager $manager
+     */
     public function loadData(ObjectManager $manager): void
     {
         foreach ($this->themeRepository->findAll() as $theme) {
@@ -46,6 +49,11 @@ class TextTemplateFixtures extends BaseFixtures implements DependentFixtureInter
         ];
     }
 
+    /**
+     * @param string $className
+     * @param int $count
+     * @param callable $factory
+     */
     protected function createMany(string $className, int $count, callable $factory)
     {
         for ($i = 0; $i < $count; $i++) {

@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Dto\ArticleGeneratorDto;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Security\Core\Security;
 use App\Entity\GeneratorHistory as HistoryEntity;
@@ -17,14 +18,14 @@ class GeneratorHistory
     /**
      * Сохраняет статью в истории
      * @param string $article
-     * @param array $data
+     * @param ArticleGeneratorDto $dto
      */
-    public function save(string $article, array $data = [])
+    public function save(string $article, ArticleGeneratorDto $dto): void
     {
         $history = new HistoryEntity();
         $history->setArticle($article)
             ->setUser($this->security->getUser())
-            ->setProps($data);
+            ->setProps($dto->toArray());
 
         $this->entityManager->persist($history);
         $this->entityManager->flush();

@@ -19,8 +19,13 @@
                 <label for="fieldTheme">{{ 'Theme' | trans }}</label>
                 <select class="form-control" id="fieldTheme" name="article_create_form[theme]">
                     {% for theme in themes %}
-                        <option {% if(loop.index == 0) %}selected{% endif %}
-                                value="{{ theme.slug }}">{{ theme.name }}</option>
+                        {% if dto.theme is defined %}
+                            <option {% if(dto.theme == theme.slug) %}selected{% endif %}
+                                    value="{{ theme.slug }}">{{ theme.name }}</option>
+                        {% else %}
+                            <option {% if(loop.index == 0) %}selected{% endif %}
+                                    value="{{ theme.slug }}">{{ theme.name }}</option>
+                        {% endif %}
                     {% endfor %}
                 </select>
             </div>
@@ -43,9 +48,7 @@
                                id="article1Word"
                                name="article_create_form[declination][1]"
                                class="form-control"
-                                {% if app.request.request.get('article_create_form')['declination'][1] is defined %}
-                                    value="{{ app.request.request.get('article_create_form')['declination'][1] }}"
-                                {% endif %}
+                               value="{{ dto.keyword[1] ?? '' }}"
                                placeholder="{{ 'Genitive' | trans }}">
                         <label for="article1Word">{{ 'Genitive' | trans }}</label>
                     </div>
@@ -55,9 +58,7 @@
                                id="article2Word"
                                name="article_create_form[declination][2]"
                                class="form-control"
-                                {% if app.request.request.get('article_create_form')['declination'][2] is defined %}
-                                    value="{{ app.request.request.get('article_create_form')['declination'][2] }}"
-                                {% endif %}
+                               value="{{ dto.keyword[2] ?? '' }}"
                                placeholder="{{ 'Dative' | trans }}">
                         <label for="article2Word">{{ 'Dative' | trans }}</label>
                     </div>
@@ -67,9 +68,7 @@
                                id="article3Word"
                                name="article_create_form[declination][3]"
                                class="form-control"
-                                {% if app.request.request.get('article_create_form')['declination'][3] is defined %}
-                                    value="{{ app.request.request.get('article_create_form')['declination'][3] }}"
-                                {% endif %}
+                               value="{{ dto.keyword[3] ?? '' }}"
                                placeholder="{{ 'Accusative' | trans }}">
                         <label for="article3Word">{{ 'Accusative' | trans }}</label>
                     </div>
@@ -79,9 +78,7 @@
                                id="article4Word"
                                name="article_create_form[declination][4]"
                                class="form-control"
-                                {% if app.request.request.get('article_create_form')['declination'][4] is defined %}
-                                    value="{{ app.request.request.get('article_create_form')['declination'][4] }}"
-                                {% endif %}
+                               value="{{ dto.keyword[4] ?? '' }}"
                                placeholder="{{ 'Instrumental case' | trans }}">
                         <label for="article4Word">{{ 'Instrumental case' | trans }}</label>
                     </div>
@@ -91,9 +88,7 @@
                                id="article5Word"
                                name="article_create_form[declination][5]"
                                class="form-control"
-                                {% if app.request.request.get('article_create_form')['declination'][5] is defined %}
-                                    value="{{ app.request.request.get('article_create_form')['declination'][5] }}"
-                                {% endif %}
+                               value="{{ dto.keyword[5] ?? '' }}"
                                placeholder="{{ 'Prepositional' | trans }}">
                         <label for="article5Word">{{ 'Prepositional' | trans }}</label>
                     </div>
@@ -103,9 +98,7 @@
                                id="article6Word"
                                name="article_create_form[declination][6]"
                                class="form-control"
-                                {% if app.request.request.get('article_create_form')['declination'][6] is defined %}
-                                    value="{{ app.request.request.get('article_create_form')['declination'][6] }}"
-                                {% endif %}
+                               value="{{ dto.keyword[6] ?? '' }}"
                                placeholder="{{ 'Plural' | trans }}">
                         <label for="article6Word">{{ 'Plural' | trans }}</label>
                     </div>
