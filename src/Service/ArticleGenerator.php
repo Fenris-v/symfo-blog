@@ -44,7 +44,7 @@ class ArticleGenerator
     public function getArticle(ArticleGeneratorDto $dto): ?string
     {
         /** @var Theme $theme */
-        $theme = $this->themeRepository->getBySlug($dto->theme);
+        $theme = $this->themeRepository->getBySlug($dto->getTheme());
         if (empty($theme)) {
             throw new Exception('Тема не найдена, проверьте корректность ввода');
         }
@@ -67,19 +67,19 @@ class ArticleGenerator
      */
     private function pasteWords(string $article, ArticleGeneratorDto $dto): string
     {
-        if (!isset($dto->wordField)) {
+        if (!$dto->getWordField()) {
             return $article;
         }
 
         if ($this->subscription->getSlug() !== \App\Entity\Subscription::LEVELS['max']) {
             return $this->pasteWord(
                 $article,
-                $dto->wordField[array_key_first($dto->wordField)],
-                $dto->wordCountField[array_key_first($dto->wordCountField)] ?? 0
+                $dto->getWordField()[array_key_first($dto->getWordField())],
+                $dto->getWordCountField()[array_key_first($dto->getWordCountField())] ?? 0
             );
         }
 
-        foreach ($dto->wordField as $key => $word) {
+        foreach ($dto->getWordField() as $key => $word) {
             $article = $this->pasteWord(
                 $article,
                 $word,
@@ -112,11 +112,11 @@ class ArticleGenerator
      */
     private function setTitle(string $article, ArticleGeneratorDto $dto): string
     {
-        if (!isset($dto->title)) {
+        if (!$dto->getTitle()) {
             return $article;
         }
 
-        return "<h1>$dto->title</h1>$article";
+        return "<h1>{$dto->getTitle()}</h1>$article";
     }
 
     /**
@@ -157,9 +157,9 @@ class ArticleGenerator
     private function getParagraphs(int $themeId, ArticleGeneratorDto $dto): array
     {
         // todo: заменить количество параграфов на количество модулей, после реализации самих модулей
-        $paragraphsCount = $dto->sizeFrom ?? 1;
-        if (!is_null($dto->sizeFrom) && !is_null($dto->sizeTo)) {
-            $paragraphsCount = rand($dto->sizeFrom, $dto->sizeTo);
+        $paragraphsCount = $dto->getSizeFrom() ?? 1;
+        if (!is_null($dto->getSizeFrom()) && !is_null($dto->getSizeTo())) {
+            $paragraphsCount = rand($dto->getSizeFrom(), $dto->getSizeTo());
         }
 
         $paragraphs = $this->textTemplateRepository

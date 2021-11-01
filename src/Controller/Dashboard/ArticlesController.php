@@ -2,7 +2,7 @@
 
 namespace App\Controller\Dashboard;
 
-use App\Dto\Factory\ArticleGeneratorDtoFactory;
+use App\Dto\ArticleGeneratorDto;
 use App\Form\ArticleCreateFormType;
 use App\Repository\ThemeRepository;
 use App\Service\ArticleGenerator;
@@ -40,11 +40,19 @@ class ArticlesController extends AbstractController
 
         /** @var array $data */
         if ($data = $request->request->get('article_create_form')) {
-            $dto = ArticleGeneratorDtoFactory::createFromArray($data);
+            $dto = new ArticleGeneratorDto();
+            $dto->setTheme($data['theme'] ?? null);
+            $dto->setTitle($data['title'] ?? null);
+            $dto->setKeyword($data['keyword'] ?? null);
+            $dto->setDeclination($data['declination'] ?? null);
+            $dto->setSizeFrom($data['sizeFrom'] ?? null);
+            $dto->setSizeTo($data['sizeTo'] ?? null);
+            $dto->setWordField($data['wordField'] ?? null);
+            $dto->setWordCountField($data['wordCountField'] ?? null);
 
             $article = $this->get('twig')
                 ->createTemplate($articleGenerator->getArticle($dto))
-                ?->render(['keyword' => $dto->keyword ?? '']);
+                ?->render(['keyword' => $dto->getKeywordWithDeclination() ?? '']);
         }
 
         return $this->render('dashboard/create_article.html.twig', [
