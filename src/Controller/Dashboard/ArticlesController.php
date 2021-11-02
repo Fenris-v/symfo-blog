@@ -2,12 +2,18 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Dto\ArticleGeneratorDto;
 use App\Form\ArticleCreateFormType;
+use App\Repository\ThemeRepository;
+use App\Service\ArticleGenerator;
+use Doctrine\ORM\NonUniqueResultException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twig\Error\LoaderError;
+use Twig\Error\SyntaxError;
 
 /**
  * @IsGranted("IS_AUTHENTICATED_REMEMBERED")
@@ -16,22 +22,45 @@ class ArticlesController extends AbstractController
 {
     /**
      * @param Request $request
+     * @param ArticleGenerator $articleGenerator
+     * @param ThemeRepository $themeRepository
      * @return Response
+     * @throws NonUniqueResultException
+     * @throws LoaderError
+     * @throws SyntaxError
      */
     #[Route('/articles/create', name: 'app_article_create')]
-    public function create(Request $request): Response
-    {
+    public function create(
+        Request $request,
+        ArticleGenerator $articleGenerator,
+        ThemeRepository $themeRepository
+    ): Response {
         $form = $this->createForm(ArticleCreateFormType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $article = $form->getData();
+        /** @var array $data */
+        if ($data = $request->request->get('article_create_form')) {
+            $dto = new ArticleGeneratorDto();
+            $dto->setTheme($data['theme'] ?? null);
+            $dto->setTitle($data['title'] ?? null);
+            $dto->setKeyword($data['keyword'] ?? null);
+            $dto->setDeclination($data['declination'] ?? null);
+            $dto->setSizeFrom($data['sizeFrom'] ?? null);
+            $dto->setSizeTo($data['sizeTo'] ?? null);
+            $dto->setWordField($data['wordField'] ?? null);
+            $dto->setWordCountField($data['wordCountField'] ?? null);
+
+            $article = $this->get('twig')
+                ->createTemplate($articleGenerator->getArticle($dto))
+                ?->render(['keyword' => $dto->getKeywordWithDeclination() ?? '']);
         }
 
         return $this->render('dashboard/create_article.html.twig', [
-            'article' => $article ?? null,
             'isLimitEnded' => true,
-            'articleForm' => $form->createView()
+            'themes' => $themeRepository->findAll(),
+            'articleForm' => $form->createView(),
+            'dto' => $dto ?? null,
+            'article' => $article ?? null
         ]);
     }
 

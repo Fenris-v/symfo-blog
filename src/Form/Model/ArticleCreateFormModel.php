@@ -7,15 +7,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 class ArticleCreateFormModel extends AbstractType
 {
-    public string $theme;
-
     public string $title;
-
-    public string $keyword;
 
     /**
      * @Assert\NotBlank(message="Поле не может быть пустым")
      */
+    public string $keyword;
+
     public int $sizeFrom;
 
     public int $sizeTo;
