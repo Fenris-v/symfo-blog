@@ -4,12 +4,15 @@ namespace App\Entity;
 
 use App\Repository\GeneratorHistoryRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Gedmo\Timestampable\Traits\TimestampableEntity;
 
 /**
  * @ORM\Entity(repositoryClass=GeneratorHistoryRepository::class)
  */
 class GeneratorHistory
 {
+    use TimestampableEntity;
+
     /**
      * @ORM\Id
      * @ORM\GeneratedValue

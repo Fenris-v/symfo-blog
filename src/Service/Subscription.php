@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Subscription as SubscriptionModel;
+use App\Enums\Subscription as SubscriptionEnum;
 use App\Entity\User;
 use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
@@ -51,7 +52,7 @@ class Subscription
         }
 
         return $this->subscriptionRepository
-            ->findOneBy(['slug' => SubscriptionModel::LEVELS['min']]);
+            ->findOneBy(['slug' => SubscriptionEnum::Free->value]);
     }
 
     /**

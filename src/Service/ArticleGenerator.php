@@ -4,6 +4,8 @@ namespace App\Service;
 
 use App\Dto\ArticleGeneratorDto;
 use App\Entity\TextTemplate;
+use App\Entity\User;
+use App\Enums\Subscription as SubscriptionEnum;
 use App\Repository\TextTemplateRepository;
 use App\Repository\ThemeRepository;
 use App\Entity\Theme;
@@ -22,26 +24,25 @@ class ArticleGenerator
     // {{ imageSrc }} - путь к картинке, предполагается использовать внутри тегов <img>
 
     private ?\App\Entity\Subscription $subscription;
+    private ?User $user;
 
     public function __construct(
-        ArticleGeneratorDto $dto,
         private TextTemplateRepository $textTemplateRepository,
         private ThemeRepository $themeRepository,
-        Subscription $subscription,
+        Subscription $subscriptionService,
         Security $security,
         private GeneratorHistory $generatorHistory
     ) {
-        $this->dto = $dto;
-        $this->subscription = $subscription->getSubscription($security->getUser());
+        $this->user = $security->getUser();
+        $this->subscription = $subscriptionService->getSubscription($this->user);
     }
 
     /**
      * @param ArticleGeneratorDto $dto
-     * @return string|null
+     * @return string
      * @throws NonUniqueResultException
-     * @throws Exception
      */
-    public function getArticle(ArticleGeneratorDto $dto): ?string
+    public function getArticle(ArticleGeneratorDto $dto): string
     {
         /** @var Theme $theme */
         $theme = $this->themeRepository->getBySlug($dto->getTheme());
@@ -71,11 +72,11 @@ class ArticleGenerator
             return $article;
         }
 
-        if ($this->subscription->getSlug() !== \App\Entity\Subscription::LEVELS['max']) {
+        if ($this->subscription->getSlug() !== SubscriptionEnum::Pro->value) {
             return $this->pasteWord(
                 $article,
                 $dto->getWordField()[array_key_first($dto->getWordField())],
-                $dto->getWordCountField()[array_key_first($dto->getWordCountField())] ?? 0
+                $dto->getWordCountField()[array_key_first($dto->getWordCountField())] ?: 0
             );
         }
 
@@ -128,6 +129,10 @@ class ArticleGenerator
      */
     private function pasteWord(string $article, string $word, int $count): string
     {
+        if (empty($word)) {
+            return $article;
+        }
+
         $text = explode(' ', $article);
         $length = count($text) - 1;
 
