@@ -24,16 +24,14 @@ class GeneratorHistoryRepository extends ServiceEntityRepository
 
     /**
      * Возвращает количество созданных статей за последний час
+     * @param DateTime $date
      * @param int $userId
      * @return int
      * @throws NoResultException
      * @throws NonUniqueResultException
      */
-    public function getArticlesCountByHour(int $userId): int
+    public function getArticlesCountAfterDateTime(DateTime $date, int $userId): int
     {
-        $date = new DateTime();
-        $date->modify('-1 hour');
-
         return $this->createQueryBuilder('gh')
             ->andWhere('gh.user=:user')
             ->setParameter('user', $userId)

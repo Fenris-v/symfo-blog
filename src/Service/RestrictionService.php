@@ -39,4 +39,26 @@ class RestrictionService
             Subscription::Plus->value, Subscription::Pro->value => true,
         };
     }
+
+    /**
+     * Проверяет использован ли лимит созданий на текущий момент
+     * @param int $countArticlesByHour
+     * @param User|null $user
+     * @return bool
+     */
+    public function canGenerate(int $countArticlesByHour, ?User $user): bool
+    {
+        if (!$user) {
+            return true;
+        }
+
+        $maxArticlesByHour = $this->getMaxCountArticleByHour();
+
+        // Строгое, т.к. в какой-то момент может появиться 0
+        if ($maxArticlesByHour === false) {
+            return false;
+        }
+
+        return $countArticlesByHour >= $maxArticlesByHour;
+    }
 }

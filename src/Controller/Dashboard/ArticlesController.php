@@ -9,6 +9,7 @@ use App\Repository\GeneratorHistoryRepository;
 use App\Repository\ThemeRepository;
 use App\Service\ArticleGenerator;
 use App\Service\RestrictionService;
+use DateTime;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
@@ -52,7 +53,12 @@ class ArticlesController extends AbstractController
         /** @var ?User $user */
         $user = $security->getUser();
 
-        $limitIsOver = $this->limitIsOver($restrictionService, $generatorHistoryRepository, $user);
+        $date = new DateTime();
+        $date->modify('-1 hour');
+        $countArticlesByHour = $generatorHistoryRepository
+            ->getArticlesCountAfterDateTime($date, $user->getId());
+
+        $limitIsOver = $restrictionService->canGenerate($countArticlesByHour, $user);
 
         /** @var array $data */
         if (!$limitIsOver && $data = $request->request->get('article_create_form')) {
@@ -61,6 +67,9 @@ class ArticlesController extends AbstractController
             $article = $this->get('twig')
                 ->createTemplate($articleGenerator->getArticle($dto))
                 ?->render(['keyword' => $dto->getKeywordWithDeclination() ?? '']);
+
+            $countArticlesByHour++;
+            $limitIsOver = $restrictionService->canGenerate($countArticlesByHour, $user);
         }
 
         return $this->render('dashboard/create_article.html.twig', [
@@ -79,35 +88,6 @@ class ArticlesController extends AbstractController
     public function index(): Response
     {
         return $this->render('base_dashboard.html.twig');
-    }
-
-    /**
-     * Проверяет использован ли лимит созданий на текущий момент
-     * @param RestrictionService $restrictionService
-     * @param GeneratorHistoryRepository $generatorHistoryRepository
-     * @param User|null $user
-     * @return bool
-     * @throws NoResultException
-     * @throws NonUniqueResultException
-     */
-    private function limitIsOver(
-        RestrictionService $restrictionService,
-        GeneratorHistoryRepository $generatorHistoryRepository,
-        ?User $user
-    ): bool {
-        if (!$user) {
-            return true;
-        }
-
-        $maxArticlesByHour = $restrictionService->getMaxCountArticleByHour();
-
-        // Строгое, т.к. в какой-то момент может появиться 0
-        if ($maxArticlesByHour === false) {
-            return false;
-        }
-
-        return $generatorHistoryRepository
-                ->getArticlesCountByHour($user->getId()) >= $maxArticlesByHour;
     }
 
     /**
