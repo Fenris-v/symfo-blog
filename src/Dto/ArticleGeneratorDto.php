@@ -4,14 +4,14 @@ namespace App\Dto;
 
 class ArticleGeneratorDto extends AbstractDto
 {
-    private ?string $theme;
-    private ?string $title;
-    private ?string $keyword;
-    private ?array $declination;
-    private ?int $sizeFrom;
-    private ?int $sizeTo;
-    private ?array $wordField;
-    private ?array $wordCountField;
+    protected ?string $theme;
+    protected ?string $title;
+    protected ?string $keyword;
+    protected ?array $declination;
+    protected ?int $sizeFrom;
+    protected ?int $sizeTo;
+    protected ?array $wordField;
+    protected ?array $wordCountField;
 
     /**
      * @return string|null

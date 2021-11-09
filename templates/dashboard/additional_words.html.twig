@@ -5,6 +5,7 @@
                    id="word1Field"
                    name="article_create_form[wordField][1]"
                    class="form-control word-input"
+                   {% if limitIsOver %}disabled{% endif %}
                     {% if word is defined %}
                         value="{{ word }}"
                     {% endif %}
@@ -18,6 +19,7 @@
                    id="word1CountField"
                    name="article_create_form[wordCountField][1]"
                    class="form-control count-input"
+                   {% if limitIsOver %}disabled{% endif %}
                     {% if app.request.request.get('article_create_form')['wordCountField'] is defined %}
                         value="{{ app.request.request.get('article_create_form')['wordCountField'][loop.index] }}"
                     {% endif %}

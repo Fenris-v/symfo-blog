@@ -7,7 +7,7 @@
 {% block content %}
     <div class="row">
         <div class="col-xl-6">
-            {% if isLimitEnded %}
+            {% if limitIsOver %}
                 <div class="alert alert-danger" role="alert">
                     {{ 'Limit ended' | trans }}
                     <a href="{{ path('app_subscription') }}">{{ 'Subscription up' | trans }}</a>
@@ -17,7 +17,9 @@
             {{ form_start(articleForm) }}
             <div class="form-group">
                 <label for="fieldTheme">{{ 'Theme' | trans }}</label>
-                <select class="form-control" id="fieldTheme" name="article_create_form[theme]">
+                <select class="form-control" id="fieldTheme"
+                        {% if limitIsOver %}disabled{% endif %}
+                        name="article_create_form[theme]">
                     {% for theme in themes %}
                         {% if dto.theme is defined %}
                             <option {% if(dto.theme == theme.slug) %}selected{% endif %}
@@ -31,7 +33,11 @@
             </div>
             {{ form_errors(articleForm.title) }}
             <div class="form-label-group">
-                {{ form_widget(articleForm.title) }}
+                {% if limitIsOver %}
+                    {{ form_widget(articleForm.title, { 'attr': { 'disabled': 'disabled' }}) }}
+                {% else %}
+                    {{ form_widget(articleForm.title) }}
+                {% endif %}
                 {{ form_label(articleForm.title) }}
             </div>
             <div class="card mb-4">
@@ -39,7 +45,11 @@
                     <p class="card-title">{{ 'Keyword' | trans }}</p>
                     {{ form_errors(articleForm.keyword) }}
                     <div class="form-label-group">
-                        {{ form_widget(articleForm.keyword) }}
+                        {% if limitIsOver %}
+                            {{ form_widget(articleForm.keyword, { 'attr': { 'disabled': 'disabled' }}) }}
+                        {% else %}
+                            {{ form_widget(articleForm.keyword) }}
+                        {% endif %}
                         {{ form_label(articleForm.keyword) }}
                     </div>
 
@@ -48,6 +58,7 @@
                                id="article1Word"
                                name="article_create_form[declination][1]"
                                class="form-control"
+                               {% if limitIsOver %}disabled{% endif %}
                                value="{{ dto.declination[1] ?? '' }}"
                                placeholder="{{ 'Genitive' | trans }}">
                         <label for="article1Word">{{ 'Genitive' | trans }}</label>
@@ -58,6 +69,7 @@
                                id="article2Word"
                                name="article_create_form[declination][2]"
                                class="form-control"
+                               {% if limitIsOver %}disabled{% endif %}
                                value="{{ dto.declination[2] ?? '' }}"
                                placeholder="{{ 'Dative' | trans }}">
                         <label for="article2Word">{{ 'Dative' | trans }}</label>
@@ -68,6 +80,7 @@
                                id="article3Word"
                                name="article_create_form[declination][3]"
                                class="form-control"
+                               {% if limitIsOver %}disabled{% endif %}
                                value="{{ dto.declination[3] ?? '' }}"
                                placeholder="{{ 'Accusative' | trans }}">
                         <label for="article3Word">{{ 'Accusative' | trans }}</label>
@@ -78,6 +91,7 @@
                                id="article4Word"
                                name="article_create_form[declination][4]"
                                class="form-control"
+                               {% if limitIsOver %}disabled{% endif %}
                                value="{{ dto.declination[4] ?? '' }}"
                                placeholder="{{ 'Instrumental case' | trans }}">
                         <label for="article4Word">{{ 'Instrumental case' | trans }}</label>
@@ -88,6 +102,7 @@
                                id="article5Word"
                                name="article_create_form[declination][5]"
                                class="form-control"
+                               {% if limitIsOver %}disabled{% endif %}
                                value="{{ dto.declination[5] ?? '' }}"
                                placeholder="{{ 'Prepositional' | trans }}">
                         <label for="article5Word">{{ 'Prepositional' | trans }}</label>
@@ -98,6 +113,7 @@
                                id="article6Word"
                                name="article_create_form[declination][6]"
                                class="form-control"
+                               {% if limitIsOver %}disabled{% endif %}
                                value="{{ dto.declination[6] ?? '' }}"
                                placeholder="{{ 'Plural' | trans }}">
                         <label for="article6Word">{{ 'Plural' | trans }}</label>
@@ -109,14 +125,22 @@
                 <div class="col">
                     {{ form_errors(articleForm.sizeFrom) }}
                     <div class="form-label-group">
-                        {{ form_widget(articleForm.sizeFrom) }}
+                        {% if limitIsOver %}
+                            {{ form_widget(articleForm.sizeFrom, { 'attr': { 'disabled': 'disabled' }}) }}
+                        {% else %}
+                            {{ form_widget(articleForm.sizeFrom) }}
+                        {% endif %}
                         {{ form_label(articleForm.sizeFrom) }}
                     </div>
                 </div>
                 <div class="col">
                     {{ form_errors(articleForm.sizeTo) }}
                     <div class="form-label-group">
-                        {{ form_widget(articleForm.sizeTo) }}
+                        {% if limitIsOver %}
+                            {{ form_widget(articleForm.sizeTo, { 'attr': { 'disabled': 'disabled' }}) }}
+                        {% else %}
+                            {{ form_widget(articleForm.sizeTo) }}
+                        {% endif %}
                         {{ form_label(articleForm.sizeTo) }}
                     </div>
                 </div>
@@ -128,21 +152,33 @@
                     <div id="wordsContainer">
                         {% if app.request.request.get('article_create_form')['wordField'] is defined %}
                             {% for word in app.request.request.get('article_create_form')['wordField'] %}
-                                {% include 'dashboard/additional_words.html.twig' with {'word': word} %}
+                                {% include 'dashboard/additional_words.html.twig' with {'word': word, 'limitIsOver': limitIsOver} %}
                             {% endfor %}
                         {% else %}
-                            {% include 'dashboard/additional_words.html.twig' %}
+                            {% include 'dashboard/additional_words.html.twig' with {'limitIsOver': limitIsOver} %}
                         {% endif %}
                     </div>
-                    <button id="addWord" class="btn btn-primary">Добавить слово</button>
+                    <button id="addWord" class="btn btn-primary">
+                        Добавить слово
+                    </button>
                 </div>
             </div>
 
             <div class="form-group">
                 {{ form_errors(articleForm.images) }}
                 {{ form_label(articleForm.images) }}
-                {{ form_widget(articleForm.images) }}
+                {% if limitIsOver %}
+                    {{ form_widget(articleForm.images, { 'attr': { 'disabled': 'disabled' }}) }}
+                {% else %}
+                    {{ form_widget(articleForm.images) }}
+                {% endif %}
             </div>
+
+            {% if limitIsOver %}
+                {{ form_widget(articleForm.submit, { 'attr': { 'disabled': 'disabled' }}) }}
+            {% else %}
+                {{ form_widget(articleForm.submit) }}
+            {% endif %}
 
             {{ form_end(articleForm) }}
         </div>
