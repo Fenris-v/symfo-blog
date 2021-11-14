@@ -56,7 +56,7 @@ class ArticlesController extends AbstractController
         $date = new DateTime();
         $date->modify('-1 hour');
         $countArticlesByHour = $generatorHistoryRepository
-            ->getArticlesCountAfterDateTime($date, $user->getId());
+            ->getArticlesCountAfterDateTime($user->getId(), $date);
 
         $limitIsOver = $restrictionService->canGenerate($countArticlesByHour, $user);
 
