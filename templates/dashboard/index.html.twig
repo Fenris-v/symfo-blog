@@ -22,13 +22,13 @@
             <div class="card-columns dashboard">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">13</h5>
+                        <h5 class="card-title">{{ countGeneratedArticles }}</h5>
                         <p class="card-text">{{ 'Count created articles' | trans }}</p>
                     </div>
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">8</h5>
+                        <h5 class="card-title">{{ countGeneratedArticlesByMonth }}</h5>
                         <p class="card-text">{{ 'Created by mounth' | trans }}</p>
                     </div>
                 </div>
@@ -51,11 +51,7 @@
                 </div>
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="card-title">Почему квадрат не круглый?</h5>
-                        <p class="card-text">При генерации контента <b>круг</b> статьи, вы можете наполнить
-                            его нужными словами <b>круг</b> для вашего бизнеса. Столько <b>круг</b> сколько
-                            <b>круг</b> нужно. Хоть все ими <b>круг</b> <b>круг</b> <b>круг</b> заполоните!.
-                        </p>
+                        {{ article | truncate(200, '...') | raw }}
                         <a href="#" class="btn btn-primary">{{ 'More' | trans }}</a>
                     </div>
                 </div>
