@@ -24,6 +24,9 @@
                         {% if dto.theme is defined %}
                             <option {% if(dto.theme == theme.slug) %}selected{% endif %}
                                     value="{{ theme.slug }}">{{ theme.name }}</option>
+                        {% elseif oldData['theme'] %}
+                            <option {% if(oldData['theme'] == theme.slug) %}selected{% endif %}
+                                    value="{{ theme.slug }}">{{ theme.name }}</option>
                         {% else %}
                             <option {% if(loop.index == 0) %}selected{% endif %}
                                     value="{{ theme.slug }}">{{ theme.name }}</option>
@@ -33,10 +36,11 @@
             </div>
             {{ form_errors(articleForm.title) }}
             <div class="form-label-group">
+                {{ dto.declination[3] ?? '' }}
                 {% if limitIsOver %}
-                    {{ form_widget(articleForm.title, { 'attr': { 'disabled': 'disabled' }}) }}
+                    {{ form_widget(articleForm.title, { 'attr': { 'disabled': 'disabled' }, 'value': dto.title ?? oldData['title'] ?? '' }) }}
                 {% else %}
-                    {{ form_widget(articleForm.title) }}
+                    {{ form_widget(articleForm.title, { 'value': dto.title ?? oldData['title'] ?? '' }) }}
                 {% endif %}
                 {{ form_label(articleForm.title) }}
             </div>
@@ -46,9 +50,9 @@
                     {{ form_errors(articleForm.keyword) }}
                     <div class="form-label-group">
                         {% if limitIsOver %}
-                            {{ form_widget(articleForm.keyword, { 'attr': { 'disabled': 'disabled' }}) }}
+                            {{ form_widget(articleForm.keyword, { 'attr': { 'disabled': 'disabled' }, 'value': dto.keyword ?? oldData['keyword'] ?? '' }) }}
                         {% else %}
-                            {{ form_widget(articleForm.keyword) }}
+                            {{ form_widget(articleForm.keyword, { 'value': dto.keyword ?? oldData['keyword'] ?? '' }) }}
                         {% endif %}
                         {{ form_label(articleForm.keyword) }}
                     </div>
@@ -59,7 +63,7 @@
                                name="article_create_form[declination][1]"
                                class="form-control"
                                {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[1] ?? '' }}"
+                               value="{{ dto.declination[1] ?? oldData['declination'][1] ?? '' }}"
                                placeholder="{{ 'Genitive' | trans }}">
                         <label for="article1Word">{{ 'Genitive' | trans }}</label>
                     </div>
@@ -70,7 +74,7 @@
                                name="article_create_form[declination][2]"
                                class="form-control"
                                {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[2] ?? '' }}"
+                               value="{{ dto.declination[2] ?? oldData['declination'][2] ?? '' }}"
                                placeholder="{{ 'Dative' | trans }}">
                         <label for="article2Word">{{ 'Dative' | trans }}</label>
                     </div>
@@ -81,7 +85,7 @@
                                name="article_create_form[declination][3]"
                                class="form-control"
                                {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[3] ?? '' }}"
+                               value="{{ dto.declination[3] ?? oldData['declination'][3] ?? '' }}"
                                placeholder="{{ 'Accusative' | trans }}">
                         <label for="article3Word">{{ 'Accusative' | trans }}</label>
                     </div>
@@ -92,7 +96,7 @@
                                name="article_create_form[declination][4]"
                                class="form-control"
                                {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[4] ?? '' }}"
+                               value="{{ dto.declination[4] ?? oldData['declination'][4] ?? '' }}"
                                placeholder="{{ 'Instrumental case' | trans }}">
                         <label for="article4Word">{{ 'Instrumental case' | trans }}</label>
                     </div>
@@ -103,7 +107,7 @@
                                name="article_create_form[declination][5]"
                                class="form-control"
                                {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[5] ?? '' }}"
+                               value="{{ dto.declination[5] ?? oldData['declination'][5] ?? '' }}"
                                placeholder="{{ 'Prepositional' | trans }}">
                         <label for="article5Word">{{ 'Prepositional' | trans }}</label>
                     </div>
@@ -114,7 +118,7 @@
                                name="article_create_form[declination][6]"
                                class="form-control"
                                {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[6] ?? '' }}"
+                               value="{{ dto.declination[6] ?? oldData['declination'][6] ?? '' }}"
                                placeholder="{{ 'Plural' | trans }}">
                         <label for="article6Word">{{ 'Plural' | trans }}</label>
                     </div>
@@ -126,9 +130,9 @@
                     {{ form_errors(articleForm.sizeFrom) }}
                     <div class="form-label-group">
                         {% if limitIsOver %}
-                            {{ form_widget(articleForm.sizeFrom, { 'attr': { 'disabled': 'disabled' }}) }}
+                            {{ form_widget(articleForm.sizeFrom, { 'attr': { 'disabled': 'disabled' }, 'value': dto.sizeFrom ?? oldData['sizeFrom'] ?? '' }) }}
                         {% else %}
-                            {{ form_widget(articleForm.sizeFrom) }}
+                            {{ form_widget(articleForm.sizeFrom, { 'value': dto.sizeFrom ?? oldData['sizeFrom'] ?? '' }) }}
                         {% endif %}
                         {{ form_label(articleForm.sizeFrom) }}
                     </div>
@@ -137,9 +141,9 @@
                     {{ form_errors(articleForm.sizeTo) }}
                     <div class="form-label-group">
                         {% if limitIsOver %}
-                            {{ form_widget(articleForm.sizeTo, { 'attr': { 'disabled': 'disabled' }}) }}
+                            {{ form_widget(articleForm.sizeTo, { 'attr': { 'disabled': 'disabled' }, 'value': dto.sizeTo ?? oldData['sizeTo'] ?? '' }) }}
                         {% else %}
-                            {{ form_widget(articleForm.sizeTo) }}
+                            {{ form_widget(articleForm.sizeTo, { 'value': dto.sizeTo ?? oldData['sizeTo'] ?? '' }) }}
                         {% endif %}
                         {{ form_label(articleForm.sizeTo) }}
                     </div>
@@ -152,6 +156,10 @@
                     <div id="wordsContainer">
                         {% if app.request.request.get('article_create_form')['wordField'] is defined %}
                             {% for word in app.request.request.get('article_create_form')['wordField'] %}
+                                {% include 'dashboard/additional_words.html.twig' with {'word': word, 'limitIsOver': limitIsOver} %}
+                            {% endfor %}
+                        {% elseif oldData['wordField'] is defined %}
+                            {% for word in oldData['wordField'] %}
                                 {% include 'dashboard/additional_words.html.twig' with {'word': word, 'limitIsOver': limitIsOver} %}
                             {% endfor %}
                         {% else %}

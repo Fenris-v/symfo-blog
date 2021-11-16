@@ -7,6 +7,7 @@ use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -46,6 +47,16 @@ class GeneratorHistoryRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
+    public function getById(int $id): GeneratorHistory
+    {
+        return $this->createQueryBuilder('gh')
+            ->orderBy('gh.createdAt')
+            ->andWhere('gh.id=:id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getSingleResult();
+    }
+
     /**
      * @param int $userId
      * @return GeneratorHistory|null
@@ -63,13 +74,15 @@ class GeneratorHistoryRepository extends ServiceEntityRepository
                 ->getSingleResult() ?? null;
     }
 
-    public function getLatestArticles(int $userId, int $limit = 5)
+    /**
+     * @param int $userId
+     * @return QueryBuilder
+     */
+    public function getLatestArticles(int $userId)
     {
         return $this->createQueryBuilder('gh')
             ->andWhere('gh.user=:user')
             ->setParameter('user', $userId)
-            ->orderBy('gh.createdAt', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->orderBy('gh.createdAt', 'DESC');
     }
 }
