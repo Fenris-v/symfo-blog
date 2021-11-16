@@ -41,4 +41,14 @@ class GeneratorHistoryRepository extends ServiceEntityRepository
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    public function getLatestArticles(int $userId, int $limit = 5)
+    {
+        return $this->createQueryBuilder('gh')
+            ->andWhere('gh.user=:user')
+            ->setParameter('user', $userId)
+            ->orderBy('gh.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

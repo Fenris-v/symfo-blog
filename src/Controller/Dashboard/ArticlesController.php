@@ -82,12 +82,21 @@ class ArticlesController extends AbstractController
     }
 
     /**
+     * @param GeneratorHistoryRepository $generatorHistoryRepository
+     * @param Security $security
      * @return Response
      */
     #[Route('/articles/history', name: 'app_article_history')]
-    public function index(): Response
-    {
-        return $this->render('base_dashboard.html.twig');
+    public function index(
+        GeneratorHistoryRepository $generatorHistoryRepository,
+        Security $security
+    ): Response {
+        /** @var User $user */
+        $user = $security->getUser();
+        $articles = $generatorHistoryRepository->getLatestArticles($user->getId());
+        dd($articles);
+
+        return $this->render('dashboard/history.twig');
     }
 
     /**
