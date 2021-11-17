@@ -3,6 +3,7 @@
 namespace App\Controller\Dashboard;
 
 use App\Dto\ArticleGeneratorDto;
+use App\Entity\GeneratorHistory;
 use App\Entity\User;
 use App\Form\ArticleCreateFormType;
 use App\Repository\GeneratorHistoryRepository;
@@ -12,12 +13,14 @@ use App\Service\RestrictionService;
 use DateTime;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
+use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
@@ -48,6 +51,11 @@ class ArticlesController extends AbstractController
         GeneratorHistoryRepository $generatorHistoryRepository,
         Security $security
     ): Response {
+        $oldDataId = $request?->request?->get('articleId') ?? null;
+        if ($oldDataId) {
+            $oldData = $generatorHistoryRepository->getById($oldDataId)?->getProps();
+        }
+
         $form = $this->createForm(ArticleCreateFormType::class);
         $form->handleRequest($request);
         /** @var ?User $user */
@@ -64,8 +72,11 @@ class ArticlesController extends AbstractController
         if (!$limitIsOver && $data = $request->request->get('article_create_form')) {
             $dto = $this->createDto($data, $restrictionService);
 
+            $article = $articleGenerator->getArticle($dto);
+            $article = $dto->getTitle() ? "<h1>{$dto->getTitle()}</h1>$article" : $article;
+
             $article = $this->get('twig')
-                ->createTemplate($articleGenerator->getArticle($dto))
+                ->createTemplate($article)
                 ?->render(['keyword' => $dto->getKeywordWithDeclination() ?? '']);
 
             $countArticlesByHour++;
@@ -77,17 +88,83 @@ class ArticlesController extends AbstractController
             'themes' => $themeRepository->findAll(),
             'articleForm' => $form->createView(),
             'dto' => $dto ?? null,
-            'article' => $article ?? null
+            'article' => $article ?? null,
+            'oldData' => $oldData ?? null
         ]);
     }
 
     /**
+     * @param GeneratorHistoryRepository $generatorHistoryRepository
+     * @param Security $security
+     * @param PaginatorInterface $paginator
+     * @param Request $request
      * @return Response
+     * @throws LoaderError
+     * @throws SyntaxError
      */
     #[Route('/articles/history', name: 'app_article_history')]
-    public function index(): Response
+    public function index(
+        GeneratorHistoryRepository $generatorHistoryRepository,
+        Security $security,
+        PaginatorInterface $paginator,
+        Request $request
+    ): Response {
+        /** @var User $user */
+        $user = $security->getUser();
+        $pagination = $paginator->paginate(
+            $generatorHistoryRepository->getLatestArticles($user->getId()),
+            $request->query->getInt('page', 1),
+            $request->query->get('perPage') ?? 5
+        );
+
+        $twig = $this->get('twig');
+
+        /** @var GeneratorHistory $item */
+        foreach ($pagination as $item) {
+            $this->setRenderedText($twig, $item);
+        }
+
+        return $this->render('dashboard/history.twig', [
+            'pagination' => $pagination
+        ]);
+    }
+
+    /**
+     * @param int $id
+     * @param GeneratorHistoryRepository $historyRepository
+     * @return Response
+     * @throws LoaderError
+     * @throws SyntaxError
+     */
+    #[Route('/articles/history/{id}', name: 'app_article_history_detail')]
+    public function show(int $id, GeneratorHistoryRepository $historyRepository): Response
     {
-        return $this->render('base_dashboard.html.twig');
+        $article = $historyRepository->getById($id);
+
+        $twig = $this->get('twig');
+        $this->setRenderedText($twig, $article);
+
+        return $this->render('dashboard/history_detail.twig', [
+            'article' => $article
+        ]);
+    }
+
+    /**
+     * @param Environment $twig
+     * @param GeneratorHistory $article
+     * @return void
+     * @throws LoaderError
+     * @throws SyntaxError
+     */
+    private function setRenderedText(Environment $twig, GeneratorHistory $article)
+    {
+        $keywords = $article->getProps()['declination'] ?? [];
+        array_unshift($keywords, $article->getProps()['keyword']);
+
+        $article->setArticle(
+            $twig->createTemplate($article->getArticle())
+                ?->render(['keyword' => $keywords])
+        );
     }
 
     /**

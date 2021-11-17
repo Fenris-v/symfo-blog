@@ -41,6 +41,7 @@ class ArticleGenerator
      * @param ArticleGeneratorDto $dto
      * @return string
      * @throws NonUniqueResultException
+     * @throws Exception
      */
     public function getArticle(ArticleGeneratorDto $dto): string
     {
@@ -53,7 +54,6 @@ class ArticleGenerator
         $paragraphs = $this->getParagraphs($theme->getId(), $dto);
         $article = $this->getHtml($paragraphs);
         $article = $this->pasteWords($article, $dto);
-        $article = $this->setTitle($article, $dto);
 
         $this->generatorHistory->save($article, $dto);
 
@@ -104,20 +104,6 @@ class ArticleGenerator
         }
 
         return $html;
-    }
-
-    /**
-     * @param string $article
-     * @param ArticleGeneratorDto $dto
-     * @return string
-     */
-    private function setTitle(string $article, ArticleGeneratorDto $dto): string
-    {
-        if (!$dto->getTitle()) {
-            return $article;
-        }
-
-        return "<h1>{$dto->getTitle()}</h1>$article";
     }
 
     /**

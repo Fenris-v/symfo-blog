@@ -22,6 +22,8 @@
                    {% if limitIsOver %}disabled{% endif %}
                     {% if app.request.request.get('article_create_form')['wordCountField'] is defined %}
                         value="{{ app.request.request.get('article_create_form')['wordCountField'][loop.index] }}"
+                    {% elseif oldData['wordCountField'] %}
+                        value="{{ oldData['wordCountField'][loop.index] }}"
                     {% endif %}
                    placeholder="{{ 'Count' | trans }}">
             <label for="word1CountField">{{ 'Count' | trans }}</label>

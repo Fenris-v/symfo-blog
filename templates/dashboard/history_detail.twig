@@ -1,0 +1,29 @@
+{% extends 'base_dashboard.html.twig' %}
+
+{% block title %}{{ article.props['title'] ?? 'История статей - детальная' }}{% endblock %}
+
+{% block h1 %}{{ article.props['title'] ?? 'История статей - детальная' }}{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xl-6">
+            {% if article.props['title'] is defined %}
+                <h1 class="mt-4">{{ article.props['title'] }}</h1>
+            {% endif %}
+
+            {{ article.article | raw }}
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="row my-4">
+        <div class="col-xl-6">
+            <form method="POST" action="{{ path('app_article_create') }}">
+                {# <a href="{{ path('app_article_create') }}" class="btn btn-primary">Попробовать еще раз</a> #}
+                <input type="hidden" name="articleId" value="{{ article.id }}">
+                <button class="btn btn-primary" type="submit">Попробовать еще раз</button>
+            </form>
+        </div>
+    </div>
+{% endblock %}
