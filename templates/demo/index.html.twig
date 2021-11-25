@@ -14,14 +14,16 @@
             Чтобы создать статью по настоящему <a href="{{ path('app_register') }}">Зарегистрируйтесь</a>
           </div>
 
-          <form class="form-signin">
+          <form class="form-signin" method="post" action="{{ path('app_demo_generator') }}">
             <div class="form-label-group">
-              <input type="email" id="articleTitle" class="form-control" placeholder="Заголовок статьи"
+              <input type="text" id="articleTitle" class="form-control"
+                     placeholder="Заголовок статьи" name="demo[title]"
                      required autofocus value="Тестовая статья" {% if disabled %}disabled{% endif %}>
               <label for="articleTitle">Заголовок статьи</label>
             </div>
             <div class="form-label-group">
-              <input type="email" id="articleWord" class="form-control" placeholder="Продвигаемое слово"
+              <input type="text" id="articleWord" class="form-control"
+                     placeholder="Продвигаемое слово" name="demo[keyword]"
                      required {% if disabled %}disabled{% endif %}>
               <label for="articleWord">Продвигаемое слово</label>
             </div>

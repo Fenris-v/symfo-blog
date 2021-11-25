@@ -45,19 +45,17 @@ class ArticleGenerator
      */
     public function getArticle(ArticleGeneratorDto $dto): string
     {
-        /** @var Theme $theme */
-        $theme = $this->themeRepository->getBySlug($dto->getTheme());
-        if (empty($theme)) {
-            throw new Exception('Тема не найдена, проверьте корректность ввода');
-        }
+        $theme = $this->getTheme($dto);
 
         $paragraphs = $this->getParagraphs($theme->getId(), $dto);
         $article = $this->getHtml($paragraphs);
         $article = $this->pasteWords($article, $dto);
 
-        $this->generatorHistory->save($article, $dto);
+        if ($this->user) {
+            $this->generatorHistory->save($article, $dto);
+        }
 
-        return $article;
+        return $this->setTitle($dto, $article);
     }
 
     /**
@@ -161,5 +159,24 @@ class ArticleGenerator
         }
 
         return $paragraphs;
+    }
+
+    public function setTitle(ArticleGeneratorDto $dto, string $article): string
+    {
+        return $dto->getTitle() ? "<h1>{$dto->getTitle()}</h1>$article" : $article;
+    }
+
+    private function getTheme(ArticleGeneratorDto $dto): Theme
+    {
+        if ($dto->getTheme()) {
+            $theme = $this->themeRepository->getBySlug($dto->getTheme());
+            if (empty($theme)) {
+                throw new Exception('Тема не найдена, проверьте корректность ввода');
+            }
+
+            return $theme;
+        }
+
+        return $this->themeRepository->getRandom();
     }
 }

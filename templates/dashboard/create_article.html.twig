@@ -24,7 +24,7 @@
                         {% if dto.theme is defined %}
                             <option {% if(dto.theme == theme.slug) %}selected{% endif %}
                                     value="{{ theme.slug }}">{{ theme.name }}</option>
-                        {% elseif oldData['theme'] %}
+                        {% elseif oldData['theme'] is defined %}
                             <option {% if(oldData['theme'] == theme.slug) %}selected{% endif %}
                                     value="{{ theme.slug }}">{{ theme.name }}</option>
                         {% else %}
