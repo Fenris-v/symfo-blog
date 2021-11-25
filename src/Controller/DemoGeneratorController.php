@@ -11,7 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Twig\Error\LoaderError;
-use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 class DemoGeneratorController extends AbstractController
