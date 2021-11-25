@@ -1,9 +1,33 @@
 {% extends 'base.html.twig' %}
 
 {% block body %}
-    {% include 'base/header.html.twig' %}
+  <nav class="navbar navbar-light bg-light static-top">
+    <div class="container">
+      <a href="{{ path('app_home') }}" class="navbar-brand">{{ sitename }}</a>
+      {% block anchors %}{% endblock %}
+      <a class="btn btn-primary" href="{{ path('app_login') }}">{{ 'Login' | trans }}</a>
+    </div>
+  </nav>
 
-    {% block content %}{% endblock %}
+  <header class="masthead text-white text-center">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-xl-9 mx-auto">
+          <h1 class="mb-5">{{ 'Service short desc' | trans }}</h1>
+        </div>
+        <div class="col-md-10 col-lg-8 col-xl-7 mx-auto">
+          <div class="form-row">
+            <div class="col-12 col-md-6 mx-auto">
+              {% block hero_block %}{% endblock %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
 
-    {% include 'base/footer.html.twig' %}
+  {% block content %}{% endblock %}
+
+  {% include 'base/footer.html.twig' %}
 {% endblock %}
