@@ -73,11 +73,9 @@ class ArticlesController extends AbstractController
             $dto = $this->createDto($data, $restrictionService);
 
             $article = $articleGenerator->getArticle($dto);
-            $article = $dto->getTitle() ? "<h1>{$dto->getTitle()}</h1>$article" : $article;
 
-            $article = $this->get('twig')
-                ->createTemplate($article)
-                ?->render(['keyword' => $dto->getKeywordWithDeclination() ?? '']);
+
+
 
             $countArticlesByHour++;
             $limitIsOver = $restrictionService->canGenerate($countArticlesByHour, $user);
