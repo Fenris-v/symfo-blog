@@ -19,39 +19,7 @@
                             </div>
                         {% endif %}
 
-                        {{ form_start(registerForm) }}
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-                        {{ form_errors(registerForm.firstName) }}
-                        <div class="form-label-group">
-                            {{ form_widget(registerForm.firstName) }}
-                            {{ form_label(registerForm.firstName) }}
-                        </div>
-
-                        {{ form_errors(registerForm.email) }}
-                        <div class="form-label-group">
-                            {{ form_widget(registerForm.email) }}
-                            {{ form_label(registerForm.email) }}
-                        </div>
-
-                        {{ form_errors(registerForm.plainPassword.first) }}
-                        <div class="form-label-group">
-                            {{ form_widget(registerForm.plainPassword.first) }}
-                            {{ form_label(registerForm.plainPassword.first) }}
-                        </div>
-
-                        {{ form_errors(registerForm.plainPassword.second) }}
-                        <div class="form-label-group">
-                            {{ form_widget(registerForm.plainPassword.second) }}
-                            {{ form_label(registerForm.plainPassword.second) }}
-                        </div>
-
-                        {{ form_widget(registerForm) }}
-                        <hr class="my-4">
-                        <div class="text-center">
-                            <a href="{{ path('app_login') }}">{{ 'Alredy registered' | trans }}</a>
-                        </div>
-                        {{ form_end(registerForm) }}
+                        {% include 'blocks/profile_form.html.twig' with {'form': registerForm, 'registerForm': true} %}
                     </div>
                 </div>
             </div>
