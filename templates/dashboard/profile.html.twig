@@ -1,0 +1,29 @@
+{% extends 'base_dashboard.html.twig' %}
+
+{% block title %}Профиль{% endblock %}
+
+{% block h1 %}Профиль{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-xl-6">
+      {% if app.session.flashBag.peek('profile_updated') | length > 0 %}
+        <div class="alert alert-success" role="alert">
+          {% for message in app.flashes('profile_updated') %}
+            {{ message }}
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="card my-4">
+        <div class="card-body">
+
+          <p>Ваш API токен: {{ token }}</p>
+          <a href="{# todo #}" class="btn btn-outline-primary">Создать новый</a>
+        </div>
+      </div>
+
+      {% include 'blocks/profile_form.html.twig' with {'form': profileForm, 'label': 'Edit'} %}
+    </div>
+  </div>
+{% endblock %}

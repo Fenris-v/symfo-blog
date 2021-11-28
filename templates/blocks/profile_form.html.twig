@@ -1,0 +1,39 @@
+{{ form_start(form) }}
+<input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+{{ form_errors(form.firstName) }}
+<div class="form-label-group">
+  {{ form_widget(form.firstName, {value: user.firstName ?? ''}) }}
+  {{ form_label(form.firstName) }}
+</div>
+
+{{ form_errors(form.email) }}
+<div class="form-label-group">
+  {{ form_widget(form.email, {value: user.email ?? ''}) }}
+  {{ form_label(form.email) }}
+</div>
+
+{{ form_errors(form.plainPassword.first) }}
+<div class="form-label-group">
+  {{ form_widget(form.plainPassword.first) }}
+  {{ form_label(form.plainPassword.first) }}
+</div>
+
+{{ form_errors(form.plainPassword.second) }}
+<div class="form-label-group">
+  {{ form_widget(form.plainPassword.second) }}
+  {{ form_label(form.plainPassword.second) }}
+</div>
+
+{% if label is defined %}
+  {{ form_widget(form.submit, {label: label}) }}
+{% else %}
+  {{ form_widget(form.submit) }}
+{% endif %}
+{% if user is not defined %}
+  <hr class="my-4">
+  <div class="text-center">
+    <a href="{{ path('app_login') }}">{{ 'Alredy registered' | trans }}</a>
+  </div>
+{% endif %}
+{{ form_end(form) }}
