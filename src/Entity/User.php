@@ -67,6 +67,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private $articles;
 
+    /**
+     * @ORM\OneToOne(targetEntity=ApiToken::class, mappedBy="user")
+     */
+    private $apiToken;
+
     public function __construct()
     {
         $this->articles = new ArrayCollection();
@@ -220,6 +225,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $article->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getApiToken(): ?ApiToken
+    {
+        return $this->apiToken;
+    }
+
+    public function setApiToken(ApiToken $apiToken): self
+    {
+        // set the owning side of the relation if necessary
+        if ($apiToken->getUser() !== $this) {
+            $apiToken->setUser($this);
+        }
+
+        $this->apiToken = $apiToken;
 
         return $this;
     }
