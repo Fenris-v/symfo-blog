@@ -15,13 +15,13 @@
 
 {{ form_errors(form.plainPassword.first) }}
 <div class="form-label-group">
-  {{ form_widget(form.plainPassword.first) }}
+  {{ form_widget(form.plainPassword.first, {value: '', attr: {autocomplete: 'new-password'}}) }}
   {{ form_label(form.plainPassword.first) }}
 </div>
 
 {{ form_errors(form.plainPassword.second) }}
 <div class="form-label-group">
-  {{ form_widget(form.plainPassword.second) }}
+  {{ form_widget(form.plainPassword.second, {value: ''}) }}
   {{ form_label(form.plainPassword.second) }}
 </div>
 

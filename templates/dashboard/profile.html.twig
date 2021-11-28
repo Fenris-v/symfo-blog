@@ -18,8 +18,14 @@
       <div class="card my-4">
         <div class="card-body">
 
-          <p>Ваш API токен: {{ token }}</p>
-          <a href="{# todo #}" class="btn btn-outline-primary">Создать новый</a>
+          {% if isExpiredToken %}
+            <p>Срок действия токена истёк</p>
+          {% elseif token %}
+            <p>Ваш API токен: {{ token }}</p>
+          {% else %}
+            <p>Токен пока не сгенерирован</p>
+          {% endif %}
+          <a href="{{ path('app_profile_token_generate') }}" class="btn btn-outline-primary">Создать новый</a>
         </div>
       </div>
 

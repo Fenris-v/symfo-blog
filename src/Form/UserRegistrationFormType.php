@@ -31,7 +31,7 @@ class UserRegistrationFormType extends AbstractType
                 'invalid_message' => 'Пароли должны совпадать',
                 'first_options' => [
                     'label' => 'Password',
-                    'attr' => ['placeholder' => 'Password']
+                    'attr' => ['placeholder' => 'Password', 'autocomplete' => 'new-password']
                 ],
                 'second_options' => [
                     'label' => 'Confirm password',
