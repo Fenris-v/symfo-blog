@@ -15,9 +15,10 @@ use Exception;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Finder\Exception\AccessDeniedException;
+use Symfony\Component\Form\Exception\AccessException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Component\Security\Http\Authentication\UserAuthenticatorInterface;
@@ -35,6 +36,10 @@ class SecurityController extends AbstractController
     #[Route('/login', name: 'app_login')]
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
+        if (!$this->isGranted('IS_ANONYMOUS')) {
+            return $this->redirectToRoute('app_dashboard');
+        }
+
         $error = $authenticationUtils->getLastAuthenticationError();
         $lastUsername = $authenticationUtils->getLastUsername();
 
@@ -61,7 +66,6 @@ class SecurityController extends AbstractController
     /**
      * Регистрация
      * @param Request $request
-     * @param UserPasswordHasherInterface $passwordHasher
      * @param UserRepository $userRepository
      * @param EventDispatcherInterface $eventDispatcher
      * @return Response|null
@@ -71,7 +75,6 @@ class SecurityController extends AbstractController
     #[Route('/register', name: 'app_register')]
     public function register(
         Request $request,
-        UserPasswordHasherInterface $passwordHasher,
         UserRepository $userRepository,
         EventDispatcherInterface $eventDispatcher
     ): ?Response {
@@ -79,7 +82,7 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $user = $userRepository->createUser($form->getData(), $passwordHasher);
+            $user = $userRepository->createUser($form->getData());
 
             $eventDispatcher->dispatch(new UserRegisteredEvent($user));
             $this->addFlash(
@@ -150,11 +153,11 @@ class SecurityController extends AbstractController
             $user = $userRepository->findOneBy(['email' => $email]);
 
             if (!$user) {
-                throw new Exception("Пользователь $email не найден");
+                throw new AccessDeniedException("Пользователь $email не найден");
             }
 
             if ($user->getIsActive()) {
-                throw new Exception("Пользователь $email уже активирован");
+                throw new AccessDeniedException("Пользователь $email уже активирован");
             }
 
             $eventDispatcher->dispatch(new UserReactivateEvent($user));
@@ -164,6 +167,7 @@ class SecurityController extends AbstractController
                 'На почту было отправлено письмо'
             );
         } catch (Exception $exception) {
+            //
         } finally {
             return $this->render(
                 'security/reactivate.html.twig',
@@ -193,7 +197,7 @@ class SecurityController extends AbstractController
             $user = $userRepository->findOneBy(['email' => $email]);
 
             if (!$user) {
-                throw new Exception("Пользователь $email не найден");
+                throw new AccessDeniedException("Пользователь $email не найден");
             }
 
             $eventDispatcher->dispatch(new UserPasswordResetEvent($user));
@@ -203,6 +207,7 @@ class SecurityController extends AbstractController
                 'На почту было отправлено письмо'
             );
         } catch (Exception $exception) {
+            //
         } finally {
             return $this->render(
                 'security/reset_password.html.twig',
@@ -218,7 +223,6 @@ class SecurityController extends AbstractController
     public function changePassword(
         string $code,
         UserRepository $userRepository,
-        UserPasswordHasherInterface $passwordHasher,
         Request $request
     ): Response {
         $user = $userRepository->findOneBy(['confirmationCode' => $code]);
@@ -231,7 +235,7 @@ class SecurityController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $userRepository->updatePassword($user, $form->getData(), $passwordHasher);
+            $userRepository->updatePassword($user, $form->getData());
 
             $this->addFlash(
                 'flash_password_reset',
@@ -263,7 +267,7 @@ class SecurityController extends AbstractController
         ]);
 
         if ($violations->count() > 0) {
-            throw new Exception($violations->get(0)->getMessage());
+            throw new AccessException($violations->get(0)->getMessage());
         }
     }
 }

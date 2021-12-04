@@ -37,10 +37,8 @@ class ArticlesController extends AbstractController
      * @param GeneratorHistoryRepository $generatorHistoryRepository
      * @param Security $security
      * @return Response
-     * @throws LoaderError
      * @throws NoResultException
      * @throws NonUniqueResultException
-     * @throws SyntaxError
      */
     #[Route('/articles/create', name: 'app_article_create')]
     public function create(
@@ -73,9 +71,6 @@ class ArticlesController extends AbstractController
             $dto = $this->createDto($data, $restrictionService);
 
             $article = $articleGenerator->getArticle($dto);
-
-
-
 
             $countArticlesByHour++;
             $limitIsOver = $restrictionService->canGenerate($countArticlesByHour, $user);

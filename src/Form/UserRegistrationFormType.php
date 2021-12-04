@@ -29,6 +29,7 @@ class UserRegistrationFormType extends AbstractType
             ->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
                 'invalid_message' => 'Пароли должны совпадать',
+                'required' => $options['block_name'] !== 'user_update',
                 'first_options' => [
                     'label' => 'Password',
                     'attr' => ['placeholder' => 'Password', 'autocomplete' => 'new-password']

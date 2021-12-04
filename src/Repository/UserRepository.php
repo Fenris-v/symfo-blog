@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Dto\ProfileDto;
 use App\Entity\User;
 use App\Form\Model\PasswordFormModel;
 use App\Form\Model\UserRegistrationFormModel;
@@ -15,8 +16,6 @@ use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
 
-use function get_class;
-
 /**
  * @method User|null find($id, $lockMode = null, $lockVersion = null)
  * @method User|null findOneBy(array $criteria, array $orderBy = null)
@@ -25,8 +24,10 @@ use function get_class;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
-    public function __construct(ManagerRegistry $registry)
-    {
+    public function __construct(
+        ManagerRegistry $registry,
+        private UserPasswordHasherInterface $passwordHasher
+    ) {
         parent::__construct($registry, User::class);
     }
 
@@ -47,21 +48,18 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
     /**
      * Создает пользователя
      * @param UserRegistrationFormModel $formModel
-     * @param UserPasswordHasherInterface $passwordHasher
      * @return User
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function createUser(
-        UserRegistrationFormModel $formModel,
-        UserPasswordHasherInterface $passwordHasher
-    ): User {
+    public function createUser(UserRegistrationFormModel $formModel): User
+    {
         $user = new User();
 
         $user->setFirstName($formModel->firstName)
             ->setEmail($formModel->email)
             ->setPassword(
-                $passwordHasher->hashPassword(
+                $this->passwordHasher->hashPassword(
                     $user,
                     $formModel->plainPassword
                 )
@@ -119,18 +117,14 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      * Обновляет пароль
      * @param User $user
      * @param PasswordFormModel $formModel
-     * @param UserPasswordHasherInterface $passwordHasher
      * @return User
      * @throws ORMException
      * @throws OptimisticLockException
      */
-    public function updatePassword(
-        User $user,
-        PasswordFormModel $formModel,
-        UserPasswordHasherInterface $passwordHasher
-    ) {
+    public function updatePassword(User $user, PasswordFormModel $formModel): User
+    {
         $user->setPassword(
-            $passwordHasher->hashPassword(
+            $this->passwordHasher->hashPassword(
                 $user,
                 $formModel->plainPassword
             )
@@ -160,6 +154,24 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->_em->persist($user);
         $this->_em->flush();
 
+        return $user;
+    }
+
+    public function updateUser(User $user, ProfileDto $profileDto): User
+    {
+        $user->setEmail($profileDto->getEmail());
+        $user->setFirstName($profileDto->getName());
+
+        if ($profileDto->getPassword() !== null) {
+            $user->setPassword(
+                $this->passwordHasher->hashPassword(
+                    $user,
+                    $profileDto->getPassword()
+                )
+            );
+        }
+
+        $this->_em->flush();
         return $user;
     }
 }

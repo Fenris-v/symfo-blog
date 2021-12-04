@@ -28,6 +28,10 @@ class DemoGeneratorController extends AbstractController
         Request $request,
         ArticleGenerator $articleGenerator
     ): Response {
+        if (!$this->isGranted('IS_ANONYMOUS')) {
+            return $this->redirectToRoute('app_dashboard');
+        }
+
         $generated = $request->cookies->get('generated', false);
         /** @var array $data */
         if (!$generated && $data = $request->request->get('demo')) {
