@@ -2,9 +2,9 @@
 
 namespace App\Controller\Dashboard;
 
-use App\Dto\ArticleGeneratorDto;
 use App\Entity\GeneratorHistory;
 use App\Entity\User;
+use App\Enums\Subscription;
 use App\Form\ArticleCreateFormType;
 use App\Repository\GeneratorHistoryRepository;
 use App\Repository\ThemeRepository;
@@ -13,6 +13,7 @@ use App\Service\RestrictionService;
 use DateTime;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Exception;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,7 +21,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
-use Twig\Environment;
 use Twig\Error\LoaderError;
 use Twig\Error\SyntaxError;
 
@@ -39,6 +39,7 @@ class ArticlesController extends AbstractController
      * @return Response
      * @throws NoResultException
      * @throws NonUniqueResultException
+     * @throws Exception
      */
     #[Route('/articles/create', name: 'app_article_create')]
     public function create(
@@ -60,17 +61,18 @@ class ArticlesController extends AbstractController
         $user = $security->getUser();
 
         $date = new DateTime();
-        $date->modify('-1 hour');
+        $date->modify(Subscription::TimeOfRestriction->value);
         $countArticlesByHour = $generatorHistoryRepository
             ->getArticlesCountAfterDateTime($user->getId(), $date);
 
         $limitIsOver = $restrictionService->canGenerate($countArticlesByHour, $user);
 
-        /** @var array $data */
+        $article = null;
         if (!$limitIsOver && $data = $request->request->get('article_create_form')) {
-            $dto = $this->createDto($data, $restrictionService);
+            /** @var array $data */
+            $article = $articleGenerator->createDto($data)->getArticle();
 
-            $article = $articleGenerator->getArticle($dto);
+            $articleGenerator->setRenderedText($this->get('twig'), $article);
 
             $countArticlesByHour++;
             $limitIsOver = $restrictionService->canGenerate($countArticlesByHour, $user);
@@ -80,8 +82,9 @@ class ArticlesController extends AbstractController
             'limitIsOver' => $limitIsOver,
             'themes' => $themeRepository->findAll(),
             'articleForm' => $form->createView(),
-            'dto' => $dto ?? null,
-            'article' => $article ?? null,
+            'dto' => $articleGenerator->getArticleGeneratorDto(),
+            'article' => $article?->getArticle(),
+            'title' => isset($article?->getProps()['title']) ? $article->getProps()['title'] : null,
             'oldData' => $oldData ?? null
         ]);
     }
@@ -91,6 +94,7 @@ class ArticlesController extends AbstractController
      * @param Security $security
      * @param PaginatorInterface $paginator
      * @param Request $request
+     * @param ArticleGenerator $articleGenerator
      * @return Response
      * @throws LoaderError
      * @throws SyntaxError
@@ -100,7 +104,8 @@ class ArticlesController extends AbstractController
         GeneratorHistoryRepository $generatorHistoryRepository,
         Security $security,
         PaginatorInterface $paginator,
-        Request $request
+        Request $request,
+        ArticleGenerator $articleGenerator
     ): Response {
         /** @var User $user */
         $user = $security->getUser();
@@ -110,11 +115,9 @@ class ArticlesController extends AbstractController
             $request->query->get('perPage') ?? 5
         );
 
-        $twig = $this->get('twig');
-
         /** @var GeneratorHistory $item */
         foreach ($pagination as $item) {
-            $this->setRenderedText($twig, $item);
+            $articleGenerator->setRenderedText($this->get('twig'), $item);
         }
 
         return $this->render('dashboard/history.twig', [
@@ -125,81 +128,23 @@ class ArticlesController extends AbstractController
     /**
      * @param int $id
      * @param GeneratorHistoryRepository $historyRepository
+     * @param ArticleGenerator $articleGenerator
      * @return Response
      * @throws LoaderError
      * @throws SyntaxError
      */
     #[Route('/articles/history/{id}', name: 'app_article_history_detail')]
-    public function show(int $id, GeneratorHistoryRepository $historyRepository): Response
-    {
+    public function show(
+        GeneratorHistoryRepository $historyRepository,
+        ArticleGenerator $articleGenerator,
+        int $id
+    ): Response {
         $article = $historyRepository->getById($id);
 
-        $twig = $this->get('twig');
-        $this->setRenderedText($twig, $article);
+        $articleGenerator->setRenderedText($this->get('twig'), $article);
 
         return $this->render('dashboard/history_detail.twig', [
             'article' => $article
         ]);
-    }
-
-    /**
-     * @param Environment $twig
-     * @param GeneratorHistory $article
-     * @return void
-     * @throws LoaderError
-     * @throws SyntaxError
-     */
-    private function setRenderedText(Environment $twig, GeneratorHistory $article)
-    {
-        $keywords = $article->getProps()['declination'] ?? [];
-        array_unshift($keywords, $article->getProps()['keyword']);
-
-        $article->setArticle(
-            $twig->createTemplate($article->getArticle())
-                ?->render(['keyword' => $keywords])
-        );
-    }
-
-    /**
-     * @param array $data
-     * @param RestrictionService $restrictionService
-     * @return ArticleGeneratorDto
-     */
-    private function createDto(
-        array $data,
-        RestrictionService $restrictionService
-    ): ArticleGeneratorDto {
-        $dto = new ArticleGeneratorDto();
-        $dto->setTheme(
-            isset($data['theme']) && $data['theme'] ? $data['theme'] : null
-        );
-        $dto->setTitle(
-            isset($data['title']) && $data['title'] ? $data['title'] : null
-        );
-        $dto->setKeyword(
-            isset($data['keyword']) && $data['keyword'] ? $data['keyword'] : null
-        );
-        $dto->setSizeFrom(
-            isset($data['sizeFrom']) && $data['sizeFrom'] ? $data['sizeFrom'] : null
-        );
-        $dto->setSizeTo(
-            isset($data['sizeTo']) && $data['sizeTo'] ? $data['sizeTo'] : null
-        );
-        $dto->setWordField(
-            isset($data['wordField']) && $data['wordField'] ? $data['wordField'] : null
-        );
-        $dto->setWordCountField(
-            isset($data['wordCountField']) && $data['wordCountField'] ? $data['wordCountField'] : null
-        );
-
-        if ($restrictionService->canHaveDeclinations()) {
-            $dto->setDeclination(
-                isset($data['declination']) && $data['declination'] ? $data['declination'] : null
-            );
-        } else {
-            $dto->setDeclination(null);
-        }
-
-        return $dto;
     }
 }

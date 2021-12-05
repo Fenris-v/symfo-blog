@@ -5,204 +5,206 @@
 {% block h1 %}Создание статьи{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-xl-6">
-            {% if limitIsOver %}
-                <div class="alert alert-danger" role="alert">
-                    {{ 'Limit ended' | trans }}
-                    <a href="{{ path('app_subscription') }}">{{ 'Subscription up' | trans }}</a>
-                </div>
-            {% endif %}
-
-            {{ form_start(articleForm) }}
-            <div class="form-group">
-                <label for="fieldTheme">{{ 'Theme' | trans }}</label>
-                <select class="form-control" id="fieldTheme"
-                        {% if limitIsOver %}disabled{% endif %}
-                        name="article_create_form[theme]">
-                    {% for theme in themes %}
-                        {% if dto.theme is defined %}
-                            <option {% if(dto.theme == theme.slug) %}selected{% endif %}
-                                    value="{{ theme.slug }}">{{ theme.name }}</option>
-                        {% elseif oldData['theme'] is defined %}
-                            <option {% if(oldData['theme'] == theme.slug) %}selected{% endif %}
-                                    value="{{ theme.slug }}">{{ theme.name }}</option>
-                        {% else %}
-                            <option {% if(loop.index == 0) %}selected{% endif %}
-                                    value="{{ theme.slug }}">{{ theme.name }}</option>
-                        {% endif %}
-                    {% endfor %}
-                </select>
-            </div>
-            {{ form_errors(articleForm.title) }}
-            <div class="form-label-group">
-                {{ dto.declination[3] ?? '' }}
-                {% if limitIsOver %}
-                    {{ form_widget(articleForm.title, { 'attr': { 'disabled': 'disabled' }, 'value': dto.title ?? oldData['title'] ?? '' }) }}
-                {% else %}
-                    {{ form_widget(articleForm.title, { 'value': dto.title ?? oldData['title'] ?? '' }) }}
-                {% endif %}
-                {{ form_label(articleForm.title) }}
-            </div>
-            <div class="card mb-4">
-                <div class="card-body">
-                    <p class="card-title">{{ 'Keyword' | trans }}</p>
-                    {{ form_errors(articleForm.keyword) }}
-                    <div class="form-label-group">
-                        {% if limitIsOver %}
-                            {{ form_widget(articleForm.keyword, { 'attr': { 'disabled': 'disabled' }, 'value': dto.keyword ?? oldData['keyword'] ?? '' }) }}
-                        {% else %}
-                            {{ form_widget(articleForm.keyword, { 'value': dto.keyword ?? oldData['keyword'] ?? '' }) }}
-                        {% endif %}
-                        {{ form_label(articleForm.keyword) }}
-                    </div>
-
-                    <div class="form-label-group">
-                        <input type="text"
-                               id="article1Word"
-                               name="article_create_form[declination][1]"
-                               class="form-control"
-                               {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[1] ?? oldData['declination'][1] ?? '' }}"
-                               placeholder="{{ 'Genitive' | trans }}">
-                        <label for="article1Word">{{ 'Genitive' | trans }}</label>
-                    </div>
-
-                    <div class="form-label-group">
-                        <input type="text"
-                               id="article2Word"
-                               name="article_create_form[declination][2]"
-                               class="form-control"
-                               {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[2] ?? oldData['declination'][2] ?? '' }}"
-                               placeholder="{{ 'Dative' | trans }}">
-                        <label for="article2Word">{{ 'Dative' | trans }}</label>
-                    </div>
-
-                    <div class="form-label-group">
-                        <input type="text"
-                               id="article3Word"
-                               name="article_create_form[declination][3]"
-                               class="form-control"
-                               {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[3] ?? oldData['declination'][3] ?? '' }}"
-                               placeholder="{{ 'Accusative' | trans }}">
-                        <label for="article3Word">{{ 'Accusative' | trans }}</label>
-                    </div>
-
-                    <div class="form-label-group">
-                        <input type="text"
-                               id="article4Word"
-                               name="article_create_form[declination][4]"
-                               class="form-control"
-                               {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[4] ?? oldData['declination'][4] ?? '' }}"
-                               placeholder="{{ 'Instrumental case' | trans }}">
-                        <label for="article4Word">{{ 'Instrumental case' | trans }}</label>
-                    </div>
-
-                    <div class="form-label-group">
-                        <input type="text"
-                               id="article5Word"
-                               name="article_create_form[declination][5]"
-                               class="form-control"
-                               {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[5] ?? oldData['declination'][5] ?? '' }}"
-                               placeholder="{{ 'Prepositional' | trans }}">
-                        <label for="article5Word">{{ 'Prepositional' | trans }}</label>
-                    </div>
-
-                    <div class="form-label-group">
-                        <input type="text"
-                               id="article6Word"
-                               name="article_create_form[declination][6]"
-                               class="form-control"
-                               {% if limitIsOver %}disabled{% endif %}
-                               value="{{ dto.declination[6] ?? oldData['declination'][6] ?? '' }}"
-                               placeholder="{{ 'Plural' | trans }}">
-                        <label for="article6Word">{{ 'Plural' | trans }}</label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col">
-                    {{ form_errors(articleForm.sizeFrom) }}
-                    <div class="form-label-group">
-                        {% if limitIsOver %}
-                            {{ form_widget(articleForm.sizeFrom, { 'attr': { 'disabled': 'disabled' }, 'value': dto.sizeFrom ?? oldData['sizeFrom'] ?? '' }) }}
-                        {% else %}
-                            {{ form_widget(articleForm.sizeFrom, { 'value': dto.sizeFrom ?? oldData['sizeFrom'] ?? '' }) }}
-                        {% endif %}
-                        {{ form_label(articleForm.sizeFrom) }}
-                    </div>
-                </div>
-                <div class="col">
-                    {{ form_errors(articleForm.sizeTo) }}
-                    <div class="form-label-group">
-                        {% if limitIsOver %}
-                            {{ form_widget(articleForm.sizeTo, { 'attr': { 'disabled': 'disabled' }, 'value': dto.sizeTo ?? oldData['sizeTo'] ?? '' }) }}
-                        {% else %}
-                            {{ form_widget(articleForm.sizeTo, { 'value': dto.sizeTo ?? oldData['sizeTo'] ?? '' }) }}
-                        {% endif %}
-                        {{ form_label(articleForm.sizeTo) }}
-                    </div>
-                </div>
-            </div>
-
-            <div class="card mb-4">
-                <div class="card-body">
-                    <p class="card-title">{{ 'Words title' | trans }}</p>
-                    <div id="wordsContainer">
-                        {% if app.request.request.get('article_create_form')['wordField'] is defined %}
-                            {% for word in app.request.request.get('article_create_form')['wordField'] %}
-                                {% include 'dashboard/additional_words.html.twig' with {'word': word, 'limitIsOver': limitIsOver} %}
-                            {% endfor %}
-                        {% elseif oldData['wordField'] is defined %}
-                            {% for word in oldData['wordField'] %}
-                                {% include 'dashboard/additional_words.html.twig' with {'word': word, 'limitIsOver': limitIsOver} %}
-                            {% endfor %}
-                        {% else %}
-                            {% include 'dashboard/additional_words.html.twig' with {'limitIsOver': limitIsOver} %}
-                        {% endif %}
-                    </div>
-                    <button id="addWord" class="btn btn-primary">
-                        Добавить слово
-                    </button>
-                </div>
-            </div>
-
-            <div class="form-group">
-                {{ form_errors(articleForm.images) }}
-                {{ form_label(articleForm.images) }}
-                {% if limitIsOver %}
-                    {{ form_widget(articleForm.images, { 'attr': { 'disabled': 'disabled' }}) }}
-                {% else %}
-                    {{ form_widget(articleForm.images) }}
-                {% endif %}
-            </div>
-
-            {% if limitIsOver %}
-                {{ form_widget(articleForm.submit, { 'attr': { 'disabled': 'disabled' }}) }}
-            {% else %}
-                {{ form_widget(articleForm.submit) }}
-            {% endif %}
-
-            {{ form_end(articleForm) }}
+  <div class="row">
+    <div class="col-xl-6">
+      {% if limitIsOver %}
+        <div class="alert alert-danger" role="alert">
+          {{ 'Limit ended' | trans }}
+          <a href="{{ path('app_subscription') }}">{{ 'Subscription up' | trans }}</a>
         </div>
+      {% endif %}
+
+      {{ form_start(articleForm) }}
+      <div class="form-group">
+        <label for="fieldTheme">{{ 'Theme' | trans }}</label>
+        <select class="form-control" id="fieldTheme"
+                {% if limitIsOver %}disabled{% endif %}
+                name="article_create_form[theme]">
+          {% for theme in themes %}
+            {% if dto.theme is defined %}
+              <option {% if(dto.theme == theme.slug) %}selected{% endif %}
+                      value="{{ theme.slug }}">{{ theme.name }}</option>
+            {% elseif oldData['theme'] is defined %}
+              <option {% if(oldData['theme'] == theme.slug) %}selected{% endif %}
+                      value="{{ theme.slug }}">{{ theme.name }}</option>
+            {% else %}
+              <option {% if(loop.index == 0) %}selected{% endif %}
+                      value="{{ theme.slug }}">{{ theme.name }}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+      </div>
+      {{ form_errors(articleForm.title) }}
+      <div class="form-label-group">
+        {% if limitIsOver %}
+          {{ form_widget(articleForm.title, { 'attr': { 'disabled': 'disabled' }, 'value': dto.title ?? oldData['title'] ?? '' }) }}
+        {% else %}
+          {{ form_widget(articleForm.title, { 'value': dto.title ?? oldData['title'] ?? '' }) }}
+        {% endif %}
+        {{ form_label(articleForm.title) }}
+      </div>
+      <div class="card mb-4">
+        <div class="card-body">
+          <p class="card-title">{{ 'Keyword' | trans }}</p>
+          {{ form_errors(articleForm.keyword) }}
+          <div class="form-label-group">
+            {% if limitIsOver %}
+              {{ form_widget(articleForm.keyword, { 'attr': { 'disabled': 'disabled' }, 'value': dto.keyword ?? oldData['keyword'] ?? '' }) }}
+            {% else %}
+              {{ form_widget(articleForm.keyword, { 'value': dto.keyword ?? oldData['keyword'] ?? '' }) }}
+            {% endif %}
+            {{ form_label(articleForm.keyword) }}
+          </div>
+
+          <div class="form-label-group">
+            <input type="text"
+                   id="article1Word"
+                   name="article_create_form[declination][1]"
+                   class="form-control"
+                   {% if limitIsOver %}disabled{% endif %}
+                   value="{{ dto.declination[1] ?? oldData['declination'][1] ?? '' }}"
+                   placeholder="{{ 'Genitive' | trans }}">
+            <label for="article1Word">{{ 'Genitive' | trans }}</label>
+          </div>
+
+          <div class="form-label-group">
+            <input type="text"
+                   id="article2Word"
+                   name="article_create_form[declination][2]"
+                   class="form-control"
+                   {% if limitIsOver %}disabled{% endif %}
+                   value="{{ dto.declination[2] ?? oldData['declination'][2] ?? '' }}"
+                   placeholder="{{ 'Dative' | trans }}">
+            <label for="article2Word">{{ 'Dative' | trans }}</label>
+          </div>
+
+          <div class="form-label-group">
+            <input type="text"
+                   id="article3Word"
+                   name="article_create_form[declination][3]"
+                   class="form-control"
+                   {% if limitIsOver %}disabled{% endif %}
+                   value="{{ dto.declination[3] ?? oldData['declination'][3] ?? '' }}"
+                   placeholder="{{ 'Accusative' | trans }}">
+            <label for="article3Word">{{ 'Accusative' | trans }}</label>
+          </div>
+
+          <div class="form-label-group">
+            <input type="text"
+                   id="article4Word"
+                   name="article_create_form[declination][4]"
+                   class="form-control"
+                   {% if limitIsOver %}disabled{% endif %}
+                   value="{{ dto.declination[4] ?? oldData['declination'][4] ?? '' }}"
+                   placeholder="{{ 'Instrumental case' | trans }}">
+            <label for="article4Word">{{ 'Instrumental case' | trans }}</label>
+          </div>
+
+          <div class="form-label-group">
+            <input type="text"
+                   id="article5Word"
+                   name="article_create_form[declination][5]"
+                   class="form-control"
+                   {% if limitIsOver %}disabled{% endif %}
+                   value="{{ dto.declination[5] ?? oldData['declination'][5] ?? '' }}"
+                   placeholder="{{ 'Prepositional' | trans }}">
+            <label for="article5Word">{{ 'Prepositional' | trans }}</label>
+          </div>
+
+          <div class="form-label-group">
+            <input type="text"
+                   id="article6Word"
+                   name="article_create_form[declination][6]"
+                   class="form-control"
+                   {% if limitIsOver %}disabled{% endif %}
+                   value="{{ dto.declination[6] ?? oldData['declination'][6] ?? '' }}"
+                   placeholder="{{ 'Plural' | trans }}">
+            <label for="article6Word">{{ 'Plural' | trans }}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col">
+          {{ form_errors(articleForm.sizeFrom) }}
+          <div class="form-label-group">
+            {% if limitIsOver %}
+              {{ form_widget(articleForm.sizeFrom, { 'attr': { 'disabled': 'disabled' }, 'value': dto.sizeFrom ?? oldData['sizeFrom'] ?? '' }) }}
+            {% else %}
+              {{ form_widget(articleForm.sizeFrom, { 'value': dto.sizeFrom ?? oldData['sizeFrom'] ?? '' }) }}
+            {% endif %}
+            {{ form_label(articleForm.sizeFrom) }}
+          </div>
+        </div>
+        <div class="col">
+          {{ form_errors(articleForm.sizeTo) }}
+          <div class="form-label-group">
+            {% if limitIsOver %}
+              {{ form_widget(articleForm.sizeTo, { 'attr': { 'disabled': 'disabled' }, 'value': dto.sizeTo ?? oldData['sizeTo'] ?? '' }) }}
+            {% else %}
+              {{ form_widget(articleForm.sizeTo, { 'value': dto.sizeTo ?? oldData['sizeTo'] ?? '' }) }}
+            {% endif %}
+            {{ form_label(articleForm.sizeTo) }}
+          </div>
+        </div>
+      </div>
+
+      <div class="card mb-4">
+        <div class="card-body">
+          <p class="card-title">{{ 'Words title' | trans }}</p>
+          <div id="wordsContainer">
+            {% if app.request.request.get('article_create_form')['wordField'] is defined %}
+              {% for word in app.request.request.get('article_create_form')['wordField'] %}
+                {% include 'dashboard/additional_words.html.twig' with {'word': word, 'limitIsOver': limitIsOver} %}
+              {% endfor %}
+            {% elseif oldData['wordField'] is defined %}
+              {% for word in oldData['wordField'] %}
+                {% include 'dashboard/additional_words.html.twig' with {'word': word, 'limitIsOver': limitIsOver} %}
+              {% endfor %}
+            {% else %}
+              {% include 'dashboard/additional_words.html.twig' with {'limitIsOver': limitIsOver} %}
+            {% endif %}
+          </div>
+          <button id="addWord" class="btn btn-primary">
+            Добавить слово
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        {{ form_errors(articleForm.images) }}
+        {{ form_label(articleForm.images) }}
+        {% if limitIsOver %}
+          {{ form_widget(articleForm.images, { 'attr': { 'disabled': 'disabled' }}) }}
+        {% else %}
+          {{ form_widget(articleForm.images) }}
+        {% endif %}
+      </div>
+
+      {% if limitIsOver %}
+        {{ form_widget(articleForm.submit, { 'attr': { 'disabled': 'disabled' }}) }}
+      {% else %}
+        {{ form_widget(articleForm.submit) }}
+      {% endif %}
+
+      {{ form_end(articleForm) }}
     </div>
+  </div>
+
+  <hr>
+
+  {% if article %}
+    <h2 class="mt-4">{{ 'Your article' | trans }}</h2>
 
     <hr>
 
-    {% if article %}
-        <h2 class="mt-4">{{ 'Your article' | trans }}</h2>
-
-        <hr>
-
-        <div class="row">
-            <div class="col-xl-6">
-                {{ article | raw }}
-            </div>
-        </div>
-    {% endif %}
+    <div class="row">
+      <div class="col-xl-6">
+        {% if title is defined %}
+          <h1 class="mt-4">{{ title }}</h1>
+        {% endif %}
+        {{ article | raw }}
+      </div>
+    </div>
+  {% endif %}
 {% endblock %}

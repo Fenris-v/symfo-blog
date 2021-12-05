@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -28,6 +29,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private $email;
 
     /**
+     * @var string The hashed password
      * @ORM\Column(type="string", length=255)
      */
     private $password;
@@ -94,6 +96,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -187,12 +192,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getSubscriptionLeft(): ?\DateTimeInterface
+    public function getSubscriptionLeft(): ?DateTimeInterface
     {
         return $this->subscriptionLeft;
     }
 
-    public function setSubscriptionLeft(?\DateTimeInterface $subscriptionLeft): self
+    public function setSubscriptionLeft(?DateTimeInterface $subscriptionLeft): self
     {
         $this->subscriptionLeft = $subscriptionLeft;
 
