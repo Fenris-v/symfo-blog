@@ -1,0 +1,27 @@
+POST https://127.0.0.1:8000/api/article/generate
+Accept: application/json
+Authorization: Bearer 4da0d5144e53a5352a2bd25f82e9fe8d4d236125
+
+{
+    "theme": "ipsum-nobis-quaerat",
+    "title": "Заголовок",
+    "keyword": "пирог",
+    "declination": {
+        "1": "пирога",
+        "2": "пирогу",
+        "3": "пирог",
+        "4": "пирогом",
+        "5": "пироге",
+        "6": "пироги"
+    },
+    "sizeFrom": "3",
+    "sizeTo": "5",
+    "wordField": {
+        "1": "слово",
+        "2": "воробей"
+    },
+    "wordCountField": {
+        "1": "3",
+        "2": "5"
+    }
+}
