@@ -2,7 +2,11 @@
 
 namespace App\Controller\Dashboard;
 
+use App\Dto\ProfileDto;
+use App\Entity\User;
+use App\Form\Model\UserRegistrationFormModel;
 use App\Form\UserRegistrationFormType;
+use App\Repository\UserRepository;
 use App\Service\ApiToken;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,18 +25,25 @@ class ProfileController extends AbstractController
     public function index(
         Request $request,
         Security $security,
-        ApiToken $apiTokenService
+        ApiToken $apiTokenService,
+        UserRepository $userRepository
     ): Response {
-        $form = $this->createForm(UserRegistrationFormType::class);
+        $form = $this->createForm(UserRegistrationFormType::class, options: ['block_name' => 'user_update']);
         $form->handleRequest($request);
+        /** @var User $user */
+        $user = $security->getUser();
 
-        $this->addFlash('profile_updated', 'Профиль успешно изменен');
+        if ($form->isSubmitted() && $form->isValid()) {
+            $profileDto = $this->createProfileDto($form->getData());
+            $userRepository->updateUser($user, $profileDto);
+            $this->addFlash('profile_updated', 'Профиль успешно изменен');
+        }
 
         return $this->render('dashboard/profile.html.twig', [
             'isExpiredToken' => $apiTokenService->isExpired(),
             'token' => $apiTokenService->getToken() ?? null,
             'profileForm' => $form->createView(),
-            'user' => $security->getUser()
+            'user' => $user
         ]);
     }
 
@@ -42,5 +53,14 @@ class ProfileController extends AbstractController
         $apiTokenService->generateToken();
         $this->addFlash('profile_updated', 'Токен успешно сгенерирован');
         return $this->redirectToRoute('app_profile');
+    }
+
+    private function createProfileDto(UserRegistrationFormModel $data): ProfileDto
+    {
+        return new ProfileDto(
+            $data->firstName,
+            $data->email,
+            $data->plainPassword ?? null
+        );
     }
 }
