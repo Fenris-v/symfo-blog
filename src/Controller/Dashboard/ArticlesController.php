@@ -14,6 +14,7 @@ use DateTime;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Exception;
+use Fenris\ThemeBundle\ThemeProvider;
 use Knp\Component\Pager\PaginatorInterface;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\IsGranted;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -30,13 +31,6 @@ use Twig\Error\SyntaxError;
 class ArticlesController extends AbstractController
 {
     /**
-     * @param Request $request
-     * @param ArticleGenerator $articleGenerator
-     * @param ThemeRepository $themeRepository
-     * @param RestrictionService $restrictionService
-     * @param GeneratorHistoryRepository $generatorHistoryRepository
-     * @param Security $security
-     * @return Response
      * @throws NoResultException
      * @throws NonUniqueResultException
      * @throws Exception
@@ -48,8 +42,10 @@ class ArticlesController extends AbstractController
         ThemeRepository $themeRepository,
         RestrictionService $restrictionService,
         GeneratorHistoryRepository $generatorHistoryRepository,
-        Security $security
+        Security $security,
+        ThemeProvider $someThemeProvider
     ): Response {
+        $someThemeProvider->addThemes();
         $oldDataId = $request?->request?->get('articleId') ?? null;
         if ($oldDataId) {
             $oldData = $generatorHistoryRepository->getById($oldDataId)?->getProps();
