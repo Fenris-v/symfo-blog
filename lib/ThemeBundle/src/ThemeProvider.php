@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Fenris\ThemeBundle;
 
 use Fenris\ThemeBundle\Contracts\Providers\ThemeProviderContract;
+use Fenris\ThemeBundle\Dto\ThemeDto;
 
 class ThemeProvider
 {
@@ -12,8 +13,8 @@ class ThemeProvider
     {
     }
 
-    public function addThemes()
+    public function getThemes(): ThemeDto
     {
-        $this->ThemeProvider->addThemes();
+        return $this->ThemeProvider->getThemes();
     }
 }

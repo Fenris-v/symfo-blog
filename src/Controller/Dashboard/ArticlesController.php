@@ -45,7 +45,7 @@ class ArticlesController extends AbstractController
         Security $security,
         ThemeProvider $someThemeProvider
     ): Response {
-        $someThemeProvider->addThemes();
+        $someThemeProvider->getThemes();
         $oldDataId = $request?->request?->get('articleId') ?? null;
         if ($oldDataId) {
             $oldData = $generatorHistoryRepository->getById($oldDataId)?->getProps();

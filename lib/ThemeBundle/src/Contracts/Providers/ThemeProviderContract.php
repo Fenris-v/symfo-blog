@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Fenris\ThemeBundle\Contracts\Providers;
 
+use Fenris\ThemeBundle\Dto\ThemeDto;
+
 interface ThemeProviderContract
 {
-    public function addThemes();
+    public function getThemes(): ThemeDto;
 }
