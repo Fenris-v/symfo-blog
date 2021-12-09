@@ -18,6 +18,7 @@ class ArticleCreateFormType extends AbstractType
         $builder
             ->add('keyword', TextType::class, [
                 'attr' => ['placeholder' => 'Keyword'],
+                'required' => false
             ])
             ->add('title', null, [
                 'attr' => ['placeholder' => 'Title'],
