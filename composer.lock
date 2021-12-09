@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8ab47005e7c41e7aa6467d3316dd9aa6",
+    "content-hash": "9f2a4407b29889658574580330c35560",
     "packages": [
         {
             "name": "beberlei/doctrineextensions",
@@ -1610,6 +1610,37 @@
                 }
             ],
             "time": "2021-10-11T09:18:27+00:00"
+        },
+        {
+            "name": "fenris/theme_bundle",
+            "version": "dev-master",
+            "dist": {
+                "type": "path",
+                "url": "lib/ThemeBundle",
+                "reference": "ce1f3e87099ed8c1fe2c790c86be9f788615807c"
+            },
+            "require": {
+                "php": "^8.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Fenris\\ThemeBundle\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Василенко Анатолий",
+                    "role": "author"
+                }
+            ],
+            "description": "Theme bundle",
+            "transport-options": {
+                "relative": true
+            }
         },
         {
             "name": "friendsofphp/proxy-manager-lts",
@@ -10999,6 +11030,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "fenris/theme_bundle": 20,
         "laminas/laminas-code": 20
     },
     "prefer-stable": true,
@@ -11006,7 +11038,8 @@
     "platform": {
         "php": "^8.1",
         "ext-ctype": "*",
-        "ext-iconv": "*"
+        "ext-iconv": "*",
+        "ext-mbstring": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "2.1.0"

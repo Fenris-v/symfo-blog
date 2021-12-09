@@ -106,6 +106,9 @@
     "egulias/email-validator": {
         "version": "3.1.1"
     },
+    "fenris/theme_bundle": {
+        "version": "dev-master"
+    },
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.5"
     },
