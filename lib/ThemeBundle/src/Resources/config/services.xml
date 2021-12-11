@@ -6,11 +6,11 @@
 
     <services>
         <service id="fenris.theme_provider" class="Fenris\ThemeBundle\ThemeProvider" public="true">
-            <argument type="service" id="fenris.theme"/>
+            <argument type="collection" id="fenris.themes"/>
         </service>
 
-        <service id="fenris.some_theme_provider" class="Fenris\ThemeBundle\Providers\SomeThemeProvider" public="false"/>
-        <service id="fenris.theme" alias="fenris.some_theme_provider" public="false"/>
+        <service id="fenris.some_theme" class="Fenris\ThemeBundle\Themes\ProgrammingTheme" public="false"/>
+        <service id="fenris.themes" alias="fenris.some_theme" public="false"/>
 
         <service id="Fenris\ThemeBundle\ThemeProvider" alias="fenris.theme_provider" public="false"/>
     </services>

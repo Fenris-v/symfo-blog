@@ -23,9 +23,11 @@ class ThemeProviderExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (null !== $config['provider']) {
-            $container->setAlias('fenris.theme', $config['provider']);
-        }
+        //        $definition = $container->getDefinition('fenris.theme_provider');
+        //        if (null !== $config['themes']) {
+        //            //            $definition->setArgument(0, new Reference($config['themes'][0]));
+        //            //            $container->setAlias('fenris.themes', $config['themes']);
+        //        }
     }
 
     public function getAlias(): string

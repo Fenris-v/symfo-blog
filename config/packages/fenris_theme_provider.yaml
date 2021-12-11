@@ -1,2 +1,4 @@
 theme_provider:
-#  provider: Fenris\ThemeBundle\Providers\SomeThemeProvider
+  themes:
+    - Fenris\ThemeBundle\Themes\CookingTheme
+    - Fenris\ThemeBundle\Themes\LiteratureTheme

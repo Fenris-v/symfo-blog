@@ -15,7 +15,8 @@ class Configuration implements ConfigurationInterface
         $rootNode = $treeBuilder->getRootNode();
 
         $rootNode->children()
-            ->scalarNode('provider')
+            ->arrayNode('themes')
+            ->scalarPrototype()
             ->defaultNull()
             ->info('Articles themes');
 
