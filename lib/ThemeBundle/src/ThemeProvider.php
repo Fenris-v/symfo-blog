@@ -5,30 +5,36 @@ declare(strict_types=1);
 namespace Fenris\ThemeBundle;
 
 use Exception;
+use Fenris\ThemeBundle\Contracts\Themes\ThemesContract;
 
 final class ThemeProvider
 {
-    public function __construct(private $theme)
+    private ?ThemesContract $theme = null;
+
+    public function __construct(private array $themes)
     {
     }
 
-    public function getThemesDto(): string
+    public function setTheme(ThemesContract $theme): void
     {
-        //                $themes = [];
-        //                foreach (LiteratureThemeEnum::cases() as $case) {
-        //                    $themes[$case->name] = $case->value;
-        //                }
-        //
-        //                return new ThemesDto($themes);
-        dd($this->theme);
-        dd($this->theme->getTheme());
-        return $this->theme->getTheme();
+        $this->theme = $theme;
+    }
+
+    public function getThemes(): array
+    {
+        $themes = [];
+        /** @var ThemesContract $theme */
+        foreach ($this->themes as $theme) {
+            $themes[$theme::class] = $theme->getTheme();
+        }
+
+        return $themes;
     }
 
     /**
      * @throws Exception
      */
-    public function getParagraphs(string $theme, int $count): array
+    public function getParagraphs(int $count): array
     {
         $data = $this->theme->getParagraphs();
 
@@ -40,19 +46,15 @@ final class ThemeProvider
         return array_slice($data, 0, $count);
     }
 
-    public function getTitle(string $theme): string
+    public function getTitle(): string
     {
-        $data = $this->theme->getTitle();
+        $titles = $this->theme->getTitles();
+        shuffle($titles);
 
-        if (empty($data)) {
-            return '';
-        }
-
-        shuffle($data);
-        return $data[array_key_first($data)];
+        return $titles[array_key_first($titles)];
     }
 
-    public function getImage(string $theme): string
+    public function getImage(): string
     {
         $themes = $this->theme->getImages();
         shuffle($themes);
@@ -60,7 +62,7 @@ final class ThemeProvider
         return $themes[array_key_first($themes)];
     }
 
-    public function getKeywords(string $theme): array
+    public function getKeywords(): array
     {
         return $this->theme->getKeywords();
     }

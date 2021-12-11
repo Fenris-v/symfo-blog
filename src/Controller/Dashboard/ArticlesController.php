@@ -73,7 +73,7 @@ class ArticlesController extends AbstractController
 
         return $this->render('dashboard/create_article.html.twig', [
             'limitIsOver' => $limitIsOver,
-            'themes' => $themeProvider->getThemesDto()->getThemes(),
+            'themes' => $themeProvider->getThemes(),
             'articleForm' => $form->createView(),
             'dto' => $articleGenerator->getArticleGeneratorDto(),
             'article' => $article?->getArticle(),

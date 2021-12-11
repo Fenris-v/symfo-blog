@@ -6,7 +6,9 @@
 
     <services>
         <service id="fenris.theme_provider" class="Fenris\ThemeBundle\ThemeProvider" public="true">
-            <argument type="collection" id="fenris.themes"/>
+            <argument type="collection" id="fenris.themes_container">
+                <argument type="service" id="fenris.themes"/>
+            </argument>
         </service>
 
         <service id="fenris.some_theme" class="Fenris\ThemeBundle\Themes\ProgrammingTheme" public="false"/>

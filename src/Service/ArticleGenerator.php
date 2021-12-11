@@ -46,17 +46,17 @@ class ArticleGenerator
 
     public function createDto(array $data): static
     {
+        $this->themeProvider->setTheme(new $data['theme']);
+
         $this->articleGeneratorDto = new ArticleGeneratorDto();
         $this->articleGeneratorDto->setTheme(isset($data['theme']) && $data['theme'] ? $data['theme'] : null);
         $this->articleGeneratorDto->setTitle(
             isset($data['title']) && $data['title']
-                ? $data['title'] : $this->themeProvider->getTitle($this->articleGeneratorDto->getTheme())
+                ? $data['title'] : $this->themeProvider->getTitle()
         );
 
-        $keywords = [];
-        if (!isset($data['keyword']) || !$data['keyword']) {
-            $keywords = $this->themeProvider->getKeywords($this->articleGeneratorDto->getTheme());
-        }
+        $keywords = isset($data['keyword']) && $data['keyword']
+            ? $data['keyword'] : $this->themeProvider->getKeywords();
         $this->articleGeneratorDto->setKeyword(
             isset($data['keyword']) && $data['keyword']
                 ? $data['keyword'] : $keywords[0]
@@ -200,16 +200,13 @@ class ArticleGenerator
     private function getParagraphs(): array
     {
         // todo: заменить количество параграфов на количество модулей, после реализации самих модулей
-        $paragraphsCount = $this->articleGeneratorDto->getSizeFrom() ?? 1;
+        $length = $this->articleGeneratorDto->getSizeFrom() ?? 1;
 
         if (!is_null($this->articleGeneratorDto->getSizeFrom()) && !is_null($this->articleGeneratorDto->getSizeTo())) {
-            $paragraphsCount = rand($this->articleGeneratorDto->getSizeFrom(), $this->articleGeneratorDto->getSizeTo());
+            $length = rand($this->articleGeneratorDto->getSizeFrom(), $this->articleGeneratorDto->getSizeTo());
         }
 
-        return $this->themeProvider->getParagraphs(
-            $this->articleGeneratorDto->getTheme(),
-            $paragraphsCount
-        );
+        return $this->themeProvider->getParagraphs($length);
     }
 
     private function setDeclinationToDto(array $data): void

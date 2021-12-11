@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Fenris\ThemeBundle\Themes;
+namespace App\Themes;
 
 use Fenris\ThemeBundle\Contracts\Themes\ThemesContract;
 
