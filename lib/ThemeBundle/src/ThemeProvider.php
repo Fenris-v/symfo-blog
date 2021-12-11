@@ -4,37 +4,66 @@ declare(strict_types=1);
 
 namespace Fenris\ThemeBundle;
 
-use Fenris\ThemeBundle\Contracts\Providers\ThemeProviderContract;
-use Fenris\ThemeBundle\Dto\ThemesDto;
+use Exception;
+use Fenris\ThemeBundle\Contracts\Themes\ThemesContract;
 
 final class ThemeProvider
 {
-    public function __construct(private ThemeProviderContract $themeProvider)
+    private ?ThemesContract $theme = null;
+
+    public function __construct(private array $themes)
     {
     }
 
-    public function getThemesDto(): ThemesDto
+    public function setTheme(ThemesContract $theme): void
     {
-        return $this->themeProvider->getThemesDto();
+        $this->theme = $theme;
     }
 
-    public function getParagraphs(string $themes, int $count): array
+    public function getThemes(): array
     {
-        return $this->themeProvider->getParagraphs($themes, $count);
+        $themes = [];
+        /** @var ThemesContract $theme */
+        foreach ($this->themes as $theme) {
+            $themes[$theme::class] = $theme->getTheme();
+        }
+
+        return $themes;
     }
 
-    public function getTitle(string $theme): string
+    /**
+     * @throws Exception
+     */
+    public function getParagraphs(int $count): array
     {
-        return $this->themeProvider->getTitle($theme);
+        $data = $this->theme->getParagraphs();
+
+        if (empty($data)) {
+            throw new Exception('Не найдено ни одного параметра подходящей темы');
+        }
+
+        shuffle($data);
+        return array_slice($data, 0, $count);
     }
 
-    public function getKeywords(string $theme): array
+    public function getTitle(): string
     {
-        return $this->themeProvider->getKeywords($theme);
+        $titles = $this->theme->getTitles();
+        shuffle($titles);
+
+        return $titles[array_key_first($titles)];
     }
 
-    public function getImage(string $theme): string
+    public function getImage(): string
     {
-        return $this->themeProvider->getImage($theme);
+        $themes = $this->theme->getImages();
+        shuffle($themes);
+
+        return $themes[array_key_first($themes)];
+    }
+
+    public function getKeywords(): array
+    {
+        return $this->theme->getKeywords();
     }
 }
