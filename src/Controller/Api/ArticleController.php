@@ -11,6 +11,7 @@ use App\Service\RestrictionService;
 use DateTime;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -64,6 +65,7 @@ class ArticleController extends AbstractController
     /**
      * @throws SyntaxError
      * @throws LoaderError
+     * @throws Exception
      */
     private function prepareResult(ArticleGenerator $articleGenerator, array $data): array
     {

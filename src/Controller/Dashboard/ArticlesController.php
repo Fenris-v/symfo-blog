@@ -7,7 +7,6 @@ use App\Entity\User;
 use App\Enums\Subscription;
 use App\Form\ArticleCreateFormType;
 use App\Repository\GeneratorHistoryRepository;
-use App\Repository\ThemeRepository;
 use App\Service\ArticleGenerator;
 use App\Service\RestrictionService;
 use DateTime;
@@ -39,13 +38,11 @@ class ArticlesController extends AbstractController
     public function create(
         Request $request,
         ArticleGenerator $articleGenerator,
-        ThemeRepository $themeRepository,
         RestrictionService $restrictionService,
         GeneratorHistoryRepository $generatorHistoryRepository,
         Security $security,
-        ThemeProvider $someThemeProvider
+        ThemeProvider $themeProvider
     ): Response {
-        $someThemeProvider->getThemes();
         $oldDataId = $request?->request?->get('articleId') ?? null;
         if ($oldDataId) {
             $oldData = $generatorHistoryRepository->getById($oldDataId)?->getProps();
@@ -76,7 +73,7 @@ class ArticlesController extends AbstractController
 
         return $this->render('dashboard/create_article.html.twig', [
             'limitIsOver' => $limitIsOver,
-            'themes' => $themeRepository->findAll(),
+            'themes' => $themeProvider->getThemes(),
             'articleForm' => $form->createView(),
             'dto' => $articleGenerator->getArticleGeneratorDto(),
             'article' => $article?->getArticle(),

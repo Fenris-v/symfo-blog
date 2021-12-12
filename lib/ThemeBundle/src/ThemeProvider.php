@@ -4,17 +4,66 @@ declare(strict_types=1);
 
 namespace Fenris\ThemeBundle;
 
-use Fenris\ThemeBundle\Contracts\Providers\ThemeProviderContract;
-use Fenris\ThemeBundle\Dto\ThemeDto;
+use Exception;
+use Fenris\ThemeBundle\Contracts\Themes\ThemesContract;
 
-class ThemeProvider
+final class ThemeProvider
 {
-    public function __construct(private ThemeProviderContract $ThemeProvider)
+    private ?ThemesContract $theme = null;
+
+    public function __construct(private array $themes)
     {
     }
 
-    public function getThemes(): ThemeDto
+    public function setTheme(ThemesContract $theme): void
     {
-        return $this->ThemeProvider->getThemes();
+        $this->theme = $theme;
+    }
+
+    public function getThemes(): array
+    {
+        $themes = [];
+        /** @var ThemesContract $theme */
+        foreach ($this->themes as $theme) {
+            $themes[$theme::class] = $theme->getTheme();
+        }
+
+        return $themes;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function getParagraphs(int $count): array
+    {
+        $data = $this->theme->getParagraphs();
+
+        if (empty($data)) {
+            throw new Exception('Не найдено ни одного параметра подходящей темы');
+        }
+
+        shuffle($data);
+        return array_slice($data, 0, $count);
+    }
+
+    public function getTitle(): string
+    {
+        $titles = $this->theme->getTitles();
+        shuffle($titles);
+
+        return $titles[array_key_first($titles)];
+    }
+
+    public function getImage(): string
+    {
+        $themes = $this->theme->getImages();
+        shuffle($themes);
+
+        return $themes[array_key_first($themes)];
+    }
+
+    public function getKeywords(): array
+    {
+        return $this->theme->getKeywords();
     }
 }

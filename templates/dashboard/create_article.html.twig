@@ -20,16 +20,16 @@
         <select class="form-control" id="fieldTheme"
                 {% if limitIsOver %}disabled{% endif %}
                 name="article_create_form[theme]">
-          {% for theme in themes %}
+          {% for key, theme in themes %}
             {% if dto.theme is defined %}
-              <option {% if(dto.theme == theme.slug) %}selected{% endif %}
-                      value="{{ theme.slug }}">{{ theme.name }}</option>
+              <option {% if(dto.theme == key) %}selected{% endif %}
+                      value="{{ key }}">{{ theme }}</option>
             {% elseif oldData['theme'] is defined %}
-              <option {% if(oldData['theme'] == theme.slug) %}selected{% endif %}
-                      value="{{ theme.slug }}">{{ theme.name }}</option>
+              <option {% if(oldData['theme'] == key) %}selected{% endif %}
+                      value="{{ key }}">{{ theme }}</option>
             {% else %}
               <option {% if(loop.index == 0) %}selected{% endif %}
-                      value="{{ theme.slug }}">{{ theme.name }}</option>
+                      value="{{ key }}">{{ theme }}</option>
             {% endif %}
           {% endfor %}
         </select>

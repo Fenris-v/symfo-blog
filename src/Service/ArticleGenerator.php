@@ -4,13 +4,10 @@ namespace App\Service;
 
 use App\Dto\ArticleGeneratorDto;
 use App\Entity\GeneratorHistory as GeneratorHistoryEntity;
-use App\Entity\TextTemplate;
-use App\Entity\Theme;
 use App\Entity\User;
 use App\Enums\Subscription as SubscriptionEnum;
-use App\Repository\TextTemplateRepository;
-use App\Repository\ThemeRepository;
 use Exception;
+use Fenris\ThemeBundle\ThemeProvider;
 use Symfony\Component\Security\Core\Security;
 use Twig\Environment;
 use Twig\Error\LoaderError;
@@ -32,12 +29,11 @@ class ArticleGenerator
     private ?string $article = null;
 
     public function __construct(
-        private TextTemplateRepository $textTemplateRepository,
-        private ThemeRepository $themeRepository,
         Subscription $subscriptionService,
         Security $security,
         private GeneratorHistory $generatorHistory,
-        private RestrictionService $restrictionService
+        private RestrictionService $restrictionService,
+        private ThemeProvider $themeProvider
     ) {
         $this->user = $security->getUser();
         $this->subscription = $subscriptionService->getSubscription($this->user);
@@ -50,26 +46,40 @@ class ArticleGenerator
 
     public function createDto(array $data): static
     {
+        $this->themeProvider->setTheme(new $data['theme']);
+
         $this->articleGeneratorDto = new ArticleGeneratorDto();
         $this->articleGeneratorDto->setTheme(isset($data['theme']) && $data['theme'] ? $data['theme'] : null);
-        $this->articleGeneratorDto->setTitle(isset($data['title']) && $data['title'] ? $data['title'] : null);
-        $this->articleGeneratorDto->setKeyword(isset($data['keyword']) && $data['keyword'] ? $data['keyword'] : null);
-        $this->articleGeneratorDto->setSizeFrom(
-            isset($data['sizeFrom']) && $data['sizeFrom'] ? $data['sizeFrom'] : null
+        $this->articleGeneratorDto->setTitle(
+            isset($data['title']) && $data['title']
+                ? $data['title'] : $this->themeProvider->getTitle()
         );
+
+        $keywords = isset($data['keyword']) && $data['keyword']
+            ? $data['keyword'] : $this->themeProvider->getKeywords();
+        $this->articleGeneratorDto->setKeyword(
+            isset($data['keyword']) && $data['keyword']
+                ? $data['keyword'] : $keywords[0]
+        );
+
+        $this->articleGeneratorDto->setSizeFrom(
+            isset($data['sizeFrom']) && $data['sizeFrom']
+                ? $data['sizeFrom'] : null
+        );
+
         $this->articleGeneratorDto->setSizeTo(isset($data['sizeTo']) && $data['sizeTo'] ? $data['sizeTo'] : null);
         $this->articleGeneratorDto->setWordField(
-            isset($data['wordField']) && $data['wordField'] ? $data['wordField'] : null
+            isset($data['wordField']) && $data['wordField']
+                ? $data['wordField'] : null
         );
 
         $this->articleGeneratorDto->setWordCountField(
-            isset($data['wordCountField']) && $data['wordCountField'] ? $data['wordCountField'] : null
+            isset($data['wordCountField']) && $data['wordCountField']
+                ? $data['wordCountField'] : null
         );
 
         if ($this->restrictionService->canHaveDeclinations()) {
-            $this->articleGeneratorDto->setDeclination(
-                isset($data['declination']) && $data['declination'] ? $data['declination'] : null
-            );
+            $this->setDeclinationToDto($data);
         } else {
             $this->articleGeneratorDto->setDeclination(null);
         }
@@ -83,9 +93,7 @@ class ArticleGenerator
      */
     public function getArticle(): GeneratorHistoryEntity
     {
-        $theme = $this->getTheme();
-
-        $paragraphs = $this->getParagraphs($theme->getId());
+        $paragraphs = $this->getParagraphs();
         $this->getHtml($paragraphs)->pasteWords();
 
         if ($this->user) {
@@ -123,7 +131,7 @@ class ArticleGenerator
         if ($this->subscription->getSlug() !== SubscriptionEnum::Pro->value) {
             $this->pasteWord(
                 $this->articleGeneratorDto->getWordField()[array_key_first($this->articleGeneratorDto->getWordField())],
-                $this->articleGeneratorDto->getWordCountField()[array_key_first(
+                (int)$this->articleGeneratorDto->getWordCountField()[array_key_first(
                     $this->articleGeneratorDto->getWordCountField()
                 )] ?: 0
             );
@@ -132,7 +140,7 @@ class ArticleGenerator
         }
 
         foreach ($this->articleGeneratorDto->getWordField() as $key => $word) {
-            $this->pasteWord($word, $this->articleGeneratorDto->getWordCountField()[$key] ?? 0);
+            $this->pasteWord($word, (int)$this->articleGeneratorDto->getWordCountField()[$key] ?? 0);
         }
 
         return $this;
@@ -145,9 +153,8 @@ class ArticleGenerator
     private function getHtml(array $paragraphs): static
     {
         $html = '';
-        /** @var TextTemplate $paragraph */
         foreach ($paragraphs as $paragraph) {
-            $html .= "<p>{$paragraph->getTemplate()}</p>";
+            $html .= "<p>$paragraph</p>";
         }
 
         $this->article = $html;
@@ -188,48 +195,31 @@ class ArticleGenerator
     }
 
     /**
-     * @param int $themeId
-     * @return array
      * @throws Exception
      */
-    private function getParagraphs(int $themeId): array
+    private function getParagraphs(): array
     {
         // todo: заменить количество параграфов на количество модулей, после реализации самих модулей
-        $paragraphsCount = $this->articleGeneratorDto->getSizeFrom() ?? 1;
+        $length = $this->articleGeneratorDto->getSizeFrom() ?? 1;
+
         if (!is_null($this->articleGeneratorDto->getSizeFrom()) && !is_null($this->articleGeneratorDto->getSizeTo())) {
-            $paragraphsCount = rand($this->articleGeneratorDto->getSizeFrom(), $this->articleGeneratorDto->getSizeTo());
+            $length = rand($this->articleGeneratorDto->getSizeFrom(), $this->articleGeneratorDto->getSizeTo());
         }
 
-        $paragraphs = $this->textTemplateRepository
-            ->getRandomParagraphs($paragraphsCount, $themeId);
-
-        if (is_null($paragraphs)) {
-            throw new Exception('Не найдено ни одного параметра подходящей темы');
-        }
-
-        return $paragraphs;
+        return $this->themeProvider->getParagraphs($length);
     }
 
-    public function setTitle(): static
+    private function setDeclinationToDto(array $data): void
     {
-        $this->article = $this->articleGeneratorDto->getTitle()
-            ? "<h1>{$this->articleGeneratorDto->getTitle()}</h1>$this->article"
-            : $this->article;
-
-        return $this;
-    }
-
-    private function getTheme(): Theme
-    {
-        if ($this->articleGeneratorDto->getTheme()) {
-            $theme = $this->themeRepository->getBySlug($this->articleGeneratorDto->getTheme());
-            if (empty($theme)) {
-                throw new Exception('Тема не найдена, проверьте корректность ввода');
-            }
-
-            return $theme;
+        if (isset($data['keyword']) && $data['keyword'] && isset($data['declination']) && $data['declination']) {
+            $this->articleGeneratorDto->setDeclination($data['declination']);
+            return;
         }
 
-        return $this->themeRepository->getRandom();
+        if ($this->articleGeneratorDto !== null) {
+            $keywords = $this->themeProvider->getKeywords($this->articleGeneratorDto->getTheme());
+            array_shift($keywords);
+            $this->articleGeneratorDto->setDeclination($keywords);
+        }
     }
 }

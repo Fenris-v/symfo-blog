@@ -9,6 +9,7 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Extension\Extension;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Reference;
 
 class ThemeProviderExtension extends Extension
 {
@@ -23,9 +24,12 @@ class ThemeProviderExtension extends Extension
         $configuration = $this->getConfiguration($configs, $container);
         $config = $this->processConfiguration($configuration, $configs);
 
-        if (null !== $config['provider']) {
-            $container->setAlias('fenris.theme', $config['provider']);
+        $definition = $container->getDefinition('fenris.theme_provider');
+        $args = $definition->getArgument(0);
+        foreach ($config['themes'] as $theme) {
+            $args[] = new Reference($theme);
         }
+        $definition->setArgument(0, $args);
     }
 
     public function getAlias(): string
