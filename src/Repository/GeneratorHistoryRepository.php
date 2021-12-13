@@ -47,31 +47,33 @@ class GeneratorHistoryRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
     }
 
-    public function getById(int $id): GeneratorHistory
+    /**
+     * @throws NonUniqueResultException
+     */
+    public function getById(int $id): ?GeneratorHistory
     {
         return $this->createQueryBuilder('gh')
             ->orderBy('gh.createdAt')
             ->andWhere('gh.id=:id')
             ->setParameter('id', $id)
             ->getQuery()
-            ->getSingleResult();
+            ->getOneOrNullResult();
     }
 
     /**
      * @param int $userId
      * @return GeneratorHistory|null
-     * @throws NoResultException
      * @throws NonUniqueResultException
      */
     public function getLastArticle(int $userId): ?GeneratorHistory
     {
         return $this->createQueryBuilder('gh')
-                ->orderBy('gh.createdAt', 'DESC')
-                ->andWhere('gh.user=:user')
-                ->setParameter('user', $userId)
-                ->setMaxResults(1)
-                ->getQuery()
-                ->getSingleResult() ?? null;
+            ->orderBy('gh.createdAt', 'DESC')
+            ->andWhere('gh.user=:user')
+            ->setParameter('user', $userId)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
