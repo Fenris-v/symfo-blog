@@ -28,4 +28,20 @@ class ModuleRepository extends ServiceEntityRepository
             ->setParameter('user', $userId)
             ->setMaxResults($limit);
     }
+
+    public function getFromAccessibleModules(int $length, ?int $userId = null): array
+    {
+        $builder = $this->createQueryBuilder('m')
+            ->where('m.user is NULL');
+
+        if ($userId !== null) {
+            $builder->where('m.user=:user_id')
+                ->setParameter('user_id', $userId);
+        }
+
+        return $builder->setMaxResults($length)
+            ->orderBy('RAND()')
+            ->getQuery()
+            ->getResult();
+    }
 }
