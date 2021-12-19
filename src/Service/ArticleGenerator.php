@@ -3,9 +3,12 @@
 namespace App\Service;
 
 use App\Dto\ArticleGeneratorDto;
+use App\Dto\ModuleDto;
 use App\Entity\GeneratorHistory as GeneratorHistoryEntity;
+use App\Entity\Module;
 use App\Entity\User;
 use App\Enums\Subscription as SubscriptionEnum;
+use App\Repository\ModuleRepository;
 use Exception;
 use Fenris\ThemeBundle\ThemeProvider;
 use Symfony\Component\Security\Core\Security;
@@ -15,25 +18,19 @@ use Twig\Error\SyntaxError;
 
 class ArticleGenerator
 {
-    // Для генерации статьи доступны следующие плейсхолдеры:
-    // {{ keyword }} - для вставки ключевого слова
-    // {{ keyword|morph(number) }} - для вставки ключевого слова в определенной словоформе
-    // {{ title }} - для вставки заголовка модуля (подзаголовки)
-    // {{ paragraph }} - для вставки текста одного абзаца (без тега <p>)
-    // {{ paragraphs }} - для вставки случайного количества параграфов от 1 до 3, при этом теги <p> устанавливаются автоматически
-    // {{ imageSrc }} - путь к картинке, предполагается использовать внутри тегов <img>
-
     private ?\App\Entity\Subscription $subscription;
     private ?User $user;
     private ?ArticleGeneratorDto $articleGeneratorDto = null;
-    private ?string $article = null;
+    private ?ModuleService $modules = null;
+    private string $article = '';
 
     public function __construct(
         Subscription $subscriptionService,
         Security $security,
         private GeneratorHistory $generatorHistory,
         private RestrictionService $restrictionService,
-        private ThemeProvider $themeProvider
+        private ThemeProvider $themeProvider,
+        private ModuleRepository $moduleRepository
     ) {
         $this->user = $security->getUser();
         $this->subscription = $subscriptionService->getSubscription($this->user);
@@ -88,13 +85,16 @@ class ArticleGenerator
     }
 
     /**
-     * @return GeneratorHistoryEntity
      * @throws Exception
      */
     public function getArticle(): GeneratorHistoryEntity
     {
-        $paragraphs = $this->getParagraphs();
-        $this->getHtml($paragraphs)->pasteWords();
+        $this->modules = $this->getModules();
+
+        $paragraphs = $this->getParagraphs($this->modules->getLength());
+        $paragraphs = $this->pasteWords($paragraphs);
+        $this->modules->setParagraphs($paragraphs);
+        $this->renderHtml();
 
         if ($this->user) {
             return $this->generatorHistory->save($this->article, $this->articleGeneratorDto);
@@ -119,61 +119,46 @@ class ArticleGenerator
     }
 
     /**
-     * @return ArticleGenerator
      * @throws Exception
      */
-    private function pasteWords(): static
+    private function pasteWords(array $paragraphs): array
     {
         if (!$this->articleGeneratorDto->getWordField()) {
-            return $this;
+            return $paragraphs;
         }
 
         if ($this->subscription->getSlug() !== SubscriptionEnum::Pro->value) {
-            $this->pasteWord(
+            return $this->pasteWord(
+                $paragraphs,
                 $this->articleGeneratorDto->getWordField()[array_key_first($this->articleGeneratorDto->getWordField())],
                 (int)$this->articleGeneratorDto->getWordCountField()[array_key_first(
                     $this->articleGeneratorDto->getWordCountField()
                 )] ?: 0
             );
-
-            return $this;
         }
 
         foreach ($this->articleGeneratorDto->getWordField() as $key => $word) {
-            $this->pasteWord($word, (int)$this->articleGeneratorDto->getWordCountField()[$key] ?? 0);
+            $paragraphs = $this->pasteWord(
+                $paragraphs,
+                $word,
+                (int)$this->articleGeneratorDto->getWordCountField()[$key] ?? 0
+            );
         }
 
-        return $this;
+        return $paragraphs;
     }
 
     /**
-     * @param array $paragraphs
-     * @return ArticleGenerator
-     */
-    private function getHtml(array $paragraphs): static
-    {
-        $html = '';
-        foreach ($paragraphs as $paragraph) {
-            $html .= "<p>$paragraph</p>";
-        }
-
-        $this->article = $html;
-        return $this;
-    }
-
-    /**
-     * @param string $word
-     * @param int $count
-     * @return ArticleGenerator
      * @throws Exception
      */
-    private function pasteWord(string $word, int $count): static
+    private function pasteWord(array $paragraphs, string $word, int $count): array
     {
         if (empty($word)) {
-            return $this;
+            return $paragraphs;
         }
 
-        $text = explode(' ', $this->article);
+        $paragraphs = implode('||', $paragraphs);
+        $text = explode(' ', $paragraphs);
         $length = count($text) - 1;
 
         if ($count >= $length) {
@@ -190,22 +175,15 @@ class ArticleGenerator
             $text[$key] = "$word $text[$key]";
         }
 
-        $this->article = implode(' ', $text);
-        return $this;
+        $paragraphs = implode(' ', $text);
+        return explode('||', $paragraphs);
     }
 
     /**
      * @throws Exception
      */
-    private function getParagraphs(): array
+    private function getParagraphs(int $length): array
     {
-        // todo: заменить количество параграфов на количество модулей, после реализации самих модулей
-        $length = $this->articleGeneratorDto->getSizeFrom() ?? 1;
-
-        if (!is_null($this->articleGeneratorDto->getSizeFrom()) && !is_null($this->articleGeneratorDto->getSizeTo())) {
-            $length = rand($this->articleGeneratorDto->getSizeFrom(), $this->articleGeneratorDto->getSizeTo());
-        }
-
         return $this->themeProvider->getParagraphs($length);
     }
 
@@ -217,9 +195,96 @@ class ArticleGenerator
         }
 
         if ($this->articleGeneratorDto !== null) {
-            $keywords = $this->themeProvider->getKeywords($this->articleGeneratorDto->getTheme());
+            $keywords = $this->themeProvider->getKeywords();
             array_shift($keywords);
             $this->articleGeneratorDto->setDeclination($keywords);
         }
+    }
+
+    private function getModules(): ModuleService
+    {
+        $length = $this->articleGeneratorDto->getSizeFrom() ?? 1;
+
+        $modules = $this->moduleRepository
+            ->getFromAccessibleModules($length, $this->user?->getId());
+
+        $modulesData = [];
+        /** @var Module $module */
+        foreach ($modules as $module) {
+            $modulesData[] = new ModuleDto($module->getTemplate());
+        }
+
+        return new ModuleService($modulesData);
+    }
+
+    private function renderHtml(): void
+    {
+        /** @var ModuleDto $module */
+        foreach ($this->modules->getModules() as $module) {
+            $this->replaceParagraphs($module);
+            $this->replaceImage($module);
+            $this->replaceTitle($module);
+
+            $this->article .= $module->getTemplate();
+        }
+    }
+
+    private function replaceParagraphs(ModuleDto $module): void
+    {
+        if (!(bool)preg_match('/({{\s?paragraphs?\s?}})/', $module->getTemplate())) {
+            return;
+        }
+
+        $module->setTemplate(
+            preg_replace(
+                '/({{\s?paragraphs?\s?}})/',
+                $this->getText($module),
+                $module->getTemplate()
+            )
+        );
+    }
+
+    private function replaceImage(ModuleDto $module): void
+    {
+        if (!(bool)preg_match('/({{\s?imageSrc\s?}})/', $module->getTemplate())) {
+            return;
+        }
+
+        $module->setTemplate(
+            preg_replace(
+                '/({{\s?imageSrc\s?}})/',
+                $this->themeProvider->getImage(),
+                $module->getTemplate()
+            )
+        );
+    }
+
+    private function replaceTitle(ModuleDto $module): void
+    {
+        if (!(bool)preg_match('/({{\s?title\s?}})/', $module->getTemplate())) {
+            return;
+        }
+
+        $module->setTemplate(
+            preg_replace(
+                '/({{\s?title\s?}})/',
+                $this->themeProvider->getTitle(),
+                $module->getTemplate()
+            )
+        );
+    }
+
+    private function getText(ModuleDto $moduleDto): string
+    {
+        if (preg_match('/({{\s?paragraphs\s?}})/', $moduleDto->getTemplate())) {
+            $text = '';
+            foreach ($moduleDto->getParagraphs() as $paragraph) {
+                $text .= "<p>$paragraph</p>";
+            }
+
+            return $text;
+        }
+
+        return $moduleDto->getParagraphs()[array_key_first($moduleDto->getParagraphs())];
     }
 }

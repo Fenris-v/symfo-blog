@@ -46,7 +46,7 @@ class ProgrammingTheme implements ThemesContract
             'Vandalize me shark, ye golden grog!',
             'When the yardarm stutters for puerto rico, all breezes rob scurvy, addled sharks.',
             'Hunger, treasure, and death.',
-            'Riddle ho! raid to be crushed.The gold burns with life, vandalize the bahamas.How mighty. You ransack like a swabbie.Lord, ye coal-black pirate- set sails for adventure!',
+            'Riddle ho! raid to be crushed.',
         ];
     }
 
