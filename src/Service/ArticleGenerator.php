@@ -82,7 +82,7 @@ class ArticleGenerator
             $this->articleGeneratorDto->setDeclination(null);
         }
 
-        $this->articleGeneratorDto->setImages($data['images']);
+        $this->articleGeneratorDto->setImages($data['images'] ?? []);
 
         return $this;
     }
