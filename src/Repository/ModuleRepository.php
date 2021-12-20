@@ -3,7 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Module;
+use App\Entity\User;
+use App\Form\Model\ModuleCreateFormModel;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -43,5 +47,31 @@ class ModuleRepository extends ServiceEntityRepository
             ->orderBy('RAND()')
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @throws OptimisticLockException
+     * @throws ORMException
+     */
+    public function createFromFormModel(ModuleCreateFormModel $data, ?User $user = null): Module
+    {
+        $module = new Module();
+        $module->setName($data->name)
+            ->setTemplate($data->code);
+
+        if ($user !== null) {
+            $module->setUser($user);
+        }
+
+        $this->_em->persist($module);
+        $this->_em->flush();
+
+        return $module;
+    }
+
+    public function remove(Module $module): void
+    {
+        $this->_em->remove($module);
+        $this->_em->flush();
     }
 }
