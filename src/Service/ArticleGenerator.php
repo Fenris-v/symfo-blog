@@ -23,6 +23,7 @@ class ArticleGenerator
     private ?ArticleGeneratorDto $articleGeneratorDto = null;
     private ?ModuleService $modules = null;
     private string $article = '';
+    private array $images = [];
 
     public function __construct(
         Subscription $subscriptionService,
@@ -81,6 +82,8 @@ class ArticleGenerator
             $this->articleGeneratorDto->setDeclination(null);
         }
 
+        $this->articleGeneratorDto->setImages($data['images']);
+
         return $this;
     }
 
@@ -89,18 +92,17 @@ class ArticleGenerator
      */
     public function getArticle(): GeneratorHistoryEntity
     {
-        $this->modules = $this->getModules();
+        $this->generateArticle();
+        return $this->generatorHistory->save($this->article, $this->articleGeneratorDto);
+    }
 
-        $paragraphs = $this->getParagraphs($this->modules->getLength());
-        $paragraphs = $this->pasteWords($paragraphs);
-        $this->modules->setParagraphs($paragraphs);
-        $this->renderHtml();
-
-        if ($this->user) {
-            return $this->generatorHistory->save($this->article, $this->articleGeneratorDto);
-        }
-
-        return $this->generatorHistory->getEntity($this->article, $this->articleGeneratorDto);
+    /**
+     * @throws Exception
+     */
+    public function getDemoArticle(): string
+    {
+        $this->generateArticle();
+        return $this->article;
     }
 
     /**
@@ -121,9 +123,22 @@ class ArticleGenerator
     /**
      * @throws Exception
      */
+    private function generateArticle(): void
+    {
+        $this->modules = $this->getModules();
+
+        $paragraphs = $this->getParagraphs($this->modules->getLength());
+        $paragraphs = $this->pasteWords($paragraphs);
+        $this->modules->setParagraphs($paragraphs);
+        $this->renderHtml();
+    }
+
+    /**
+     * @throws Exception
+     */
     private function pasteWords(array $paragraphs): array
     {
-        if (!$this->articleGeneratorDto->getWordField()) {
+        if ($this->articleGeneratorDto?->getWordField() === null) {
             return $paragraphs;
         }
 
@@ -203,7 +218,7 @@ class ArticleGenerator
 
     private function getModules(): ModuleService
     {
-        $length = $this->articleGeneratorDto->getSizeFrom() ?? 1;
+        $length = $this->articleGeneratorDto?->getSizeFrom() ?? 1;
 
         $modules = $this->moduleRepository
             ->getFromAccessibleModules($length, $this->user?->getId());
@@ -219,6 +234,8 @@ class ArticleGenerator
 
     private function renderHtml(): void
     {
+        $this->images = $this->articleGeneratorDto->getImages();
+
         /** @var ModuleDto $module */
         foreach ($this->modules->getModules() as $module) {
             $this->replaceParagraphs($module);
@@ -250,10 +267,12 @@ class ArticleGenerator
             return;
         }
 
+        $image = $this->getImage();
+
         $module->setTemplate(
             preg_replace(
                 '/({{\s?imageSrc\s?}})/',
-                $this->themeProvider->getImage(),
+                $image,
                 $module->getTemplate()
             )
         );
@@ -286,5 +305,14 @@ class ArticleGenerator
         }
 
         return $moduleDto->getParagraphs()[array_key_first($moduleDto->getParagraphs())];
+    }
+
+    private function getImage()
+    {
+        if (!empty($this->images)) {
+            return array_shift($this->images);
+        }
+
+        return $this->themeProvider->getImage();
     }
 }

@@ -20,6 +20,13 @@ final class ThemeProvider
         $this->theme = $theme;
     }
 
+    public function setRandomTheme(): void
+    {
+        $themes = $this->themes;
+        shuffle($themes);
+        $this->theme = new $themes[array_key_first($themes)];
+    }
+
     public function getThemes(): array
     {
         $themes = [];
@@ -36,6 +43,10 @@ final class ThemeProvider
      */
     public function getParagraphs(int $count): array
     {
+        if ($this->theme === null) {
+            $this->setRandomTheme();
+        }
+
         $data = $this->theme->getParagraphs();
 
         if (empty($data)) {

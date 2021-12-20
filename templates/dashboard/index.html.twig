@@ -5,57 +5,60 @@
 {% block h1 %}Рабочий стол{% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="col-xl-8 border-right">
-            {% if subscription.slug != 'free' and daysForEnd < 3 %}
-                <div class="alert alert-warning" role="alert">
-                    Подписка истекает
-                    {% if daysForEnd == 0 %}
-                        в течение суток
-                    {% elseif daysForEnd == 1 %}
-                        через 1 день
-                    {% else %}
-                        через {{ daysForEnd }} дня
-                    {% endif %}
-                </div>
-            {% endif %}
-            <div class="card-columns dashboard">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ countGeneratedArticles }}</h5>
-                        <p class="card-text">{{ 'Count created articles' | trans }}</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ countGeneratedArticlesByMonth }}</h5>
-                        <p class="card-text">{{ 'Created by mounth' | trans }}</p>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ subscription.name }}</h5>
-                        <p class="card-text">{{ 'Subscription level' | trans }}</p>
-                        {% if canUpdate %}
-                            <a href="{{ path('app_subscription') }}" class="btn btn-primary">
-                                {{ 'Up' | trans }}
-                            </a>
-                        {% endif %}
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ 'Create article' | trans }}</h5>
-                        <a href="{{ path('app_article_create') }}" class="btn btn-primary">{{ 'Create' | trans }}</a>
-                    </div>
-                </div>
-                <div class="card">
-                    <div class="card-body">
-                        {{ article | truncate(200, '...') | raw }}
-                        <a href="#" class="btn btn-primary">{{ 'More' | trans }}</a>
-                    </div>
-                </div>
-            </div>
+  <div class="row">
+    <div class="col-xl-8 border-right">
+      {% if subscription.slug != 'free' and daysForEnd < 3 %}
+        <div class="alert alert-warning" role="alert">
+          Подписка истекает
+          {% if daysForEnd == 0 %}
+            в течение суток
+          {% elseif daysForEnd == 1 %}
+            через 1 день
+          {% else %}
+            через {{ daysForEnd }} дня
+          {% endif %}
         </div>
+      {% endif %}
+      <div class="card-columns dashboard">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{ countGeneratedArticles }}</h5>
+            <p class="card-text">{{ 'Count created articles' | trans }}</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{ countGeneratedArticlesByMonth }}</h5>
+            <p class="card-text">{{ 'Created by mounth' | trans }}</p>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{ subscription.name }}</h5>
+            <p class="card-text">{{ 'Subscription level' | trans }}</p>
+            {% if canUpdate %}
+              <a href="{{ path('app_subscription') }}" class="btn btn-primary">
+                {{ 'Up' | trans }}
+              </a>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">{{ 'Create article' | trans }}</h5>
+            <a href="{{ path('app_article_create') }}" class="btn btn-primary">{{ 'Create' | trans }}</a>
+          </div>
+        </div>
+        {% if articleId != null %}
+        <div class="card">
+          <div class="card-body">
+            {{ article | truncate(200, '...') | raw }}
+            <a href="{{ path('app_article_history_detail', { id: articleId }) }}"
+               class="btn btn-primary">{{ 'More' | trans }}</a>
+          </div>
+          {% endif %}
+        </div>
+      </div>
     </div>
+  </div>
 {% endblock %}

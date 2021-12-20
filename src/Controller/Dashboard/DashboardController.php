@@ -69,6 +69,7 @@ class DashboardController extends AbstractController
             'canUpdate' => $subscriptionService->canUpdate($subscription),
             'subscription' => $subscription,
             'article' => $article ?? '',
+            'articleId' => $lastArticle->getId() ?? null,
             'countGeneratedArticles' => $countGeneratedArticles,
             'countGeneratedArticlesByMonth' => $countGeneratedArticlesByMonth
         ]);
