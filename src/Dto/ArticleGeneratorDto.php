@@ -12,6 +12,7 @@ class ArticleGeneratorDto extends AbstractDto
     protected ?int $sizeTo = null;
     protected ?array $wordField = null;
     protected ?array $wordCountField = null;
+    protected array $images = [];
 
     /**
      * @return string|null
@@ -75,6 +76,16 @@ class ArticleGeneratorDto extends AbstractDto
     public function setDeclination(?array $declination): void
     {
         $this->declination = $declination;
+    }
+
+    public function setImages(array $images): void
+    {
+        $this->images = $images;
+    }
+
+    public function getImages(): array
+    {
+        return $this->images;
     }
 
     /**

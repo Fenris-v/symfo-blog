@@ -8,6 +8,7 @@ use App\Enums\Subscription;
 use App\Form\ArticleCreateFormType;
 use App\Repository\GeneratorHistoryRepository;
 use App\Service\ArticleGenerator;
+use App\Service\FileUploader;
 use App\Service\RestrictionService;
 use DateTime;
 use Doctrine\ORM\NonUniqueResultException;
@@ -41,7 +42,8 @@ class ArticlesController extends AbstractController
         RestrictionService $restrictionService,
         GeneratorHistoryRepository $generatorHistoryRepository,
         Security $security,
-        ThemeProvider $themeProvider
+        ThemeProvider $themeProvider,
+        FileUploader $articleFileUploader
     ): Response {
         $oldDataId = $request?->request?->get('articleId') ?? null;
         if ($oldDataId) {
@@ -62,6 +64,8 @@ class ArticlesController extends AbstractController
 
         $article = null;
         if (!$limitIsOver && $data = $request->request->get('article_create_form')) {
+            $data['images'] = $this->uploadImages($articleFileUploader, $form->get('images')->getData());
+
             /** @var array $data */
             $article = $articleGenerator->createDto($data)->getArticle();
 
@@ -125,6 +129,7 @@ class ArticlesController extends AbstractController
      * @return Response
      * @throws LoaderError
      * @throws SyntaxError
+     * @throws NonUniqueResultException
      */
     #[Route('/articles/history/{id}', name: 'app_article_history_detail')]
     public function show(
@@ -139,5 +144,17 @@ class ArticlesController extends AbstractController
         return $this->render('dashboard/history_detail.twig', [
             'article' => $article
         ]);
+    }
+
+    private function uploadImages(
+        FileUploader $articleFileUploader,
+        array $images
+    ): array {
+        $articleImages = [];
+        foreach ($images as $image) {
+            $articleImages[] = $this->getParameter('article_uploads_url') . $articleFileUploader->uploadFile($image);
+        }
+
+        return $articleImages;
     }
 }

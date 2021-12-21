@@ -24,6 +24,7 @@
         "knplabs/knp-paginator-bundle": "^5.7",
         "laminas/laminas-code": "4.5.x-dev",
         "liip/imagine-bundle": "^2.6",
+        "oneup/flysystem-bundle": "^4.3",
         "phpdocumentor/reflection-docblock": "^5.2",
         "sensio/framework-extra-bundle": "^6.1",
         "stof/doctrine-extensions-bundle": "^1.6",

@@ -40,7 +40,7 @@ class DemoGeneratorController extends AbstractController
 
             $articleDto = $this->createDto($data);
 
-            $article = $articleGenerator->getArticle($articleDto);
+            $article = $articleGenerator->getDemoArticle();
 
             $article = $this->get('twig')
                 ->createTemplate($article)

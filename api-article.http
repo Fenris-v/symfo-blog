@@ -1,9 +1,9 @@
 POST https://127.0.0.1:8000/api/article/generate
-Accept: application/json
-Authorization: Bearer 4da0d5144e53a5352a2bd25f82e9fe8d4d236125
+Content-Type: application/json
+Authorization: Bearer f77a093463986b0b6299757b70c832557418cf16
 
 {
-    "theme": "ipsum-nobis-quaerat",
+    "theme": "Fenris\\ThemeBundle\\Themes\\ProgrammingTheme",
     "title": "Заголовок",
     "keyword": "пирог",
     "declination": {
